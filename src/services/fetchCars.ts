@@ -8,6 +8,9 @@ export async function fetchCars() {
       model,
       year,
       color,
+      fuel_type,
+      transmission,
+      seats,
       city,
       car_pricing (
         price_per_day,
@@ -17,6 +20,10 @@ export async function fetchCars() {
       car_images (
         image_url,
         is_thumbnail
+      ),
+      users!owner_id(
+        name,
+        id
       )
     `)
     .eq("availability_status", "available");

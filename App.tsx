@@ -6,9 +6,14 @@ import HomeScreen from './src/screens/HomeScreen'
 import ProfileScreen from './src/screens/ProfileScreen'
 import { NavigationContainer } from '@react-navigation/native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import Feather from '@expo/vector-icons/Feather';
 
 import { useFonts } from 'expo-font'
+import DetailScreen from './src/screens/DetailScreen'
 const Tab = createBottomTabNavigator()
+const Stack = createNativeStackNavigator()
 
 export default function App() {
   const [user, setUser] = useState<any | null>(null)
@@ -31,10 +36,13 @@ export default function App() {
 
   if (!user) return <LoginScreen onLogin={setUser} />
 
-  return (
-    <NavigationContainer>
-      <Tab.Navigator screenOptions={{ headerShown: false }}>
-        <Tab.Screen name="Home" component={HomeScreen} />
+
+  const MyTabs = () => (
+  <Tab.Navigator screenOptions={{ headerShown: false, tabBarActiveTintColor: "#192f6a" }}>
+        <Tab.Screen name="Home" component={HomeScreen} options={{tabBarIcon: ({ color, size }) => (
+          <Feather name="home" size={size} color={color} />
+        ),
+        }}/>
         <Tab.Screen
           name="Profile"
           children={() => (
@@ -46,8 +54,19 @@ export default function App() {
               }}
             />
           )}
+          options={{ tabBarIcon: ({color, size}) => (
+            <MaterialCommunityIcons name="account-circle-outline" size={size} color={color} />
+          )}}
         />
       </Tab.Navigator>
+  )
+
+  return (
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{headerShown: false}}>
+        <Stack.Screen name="Tabs" component={MyTabs} />
+        <Stack.Screen name="Details" component={DetailScreen}/>
+      </Stack.Navigator>
     </NavigationContainer>
   )
 }

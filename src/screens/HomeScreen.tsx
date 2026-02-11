@@ -1,23 +1,30 @@
 import React, { useEffect, useState } from 'react'
-import { View, Text, FlatList, StyleSheet, RefreshControl, ScrollView, Image, TouchableOpacity, TextInput } from 'react-native'
+import { View, Text, FlatList, StyleSheet, RefreshControl, ScrollView, Image, TouchableOpacity, TextInput, Button } from 'react-native'
 import { supabase } from '../../lib/supabase'
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import type { User } from '../types/user';
+import { LinearGradient } from "expo-linear-gradient";
 import Octicons from '@expo/vector-icons/Octicons';
 import promo1 from '../../assets/promotions/promo-1.png';
 import promo2 from '../../assets/promotions/promo-2.png';
 import { Dimensions } from 'react-native';
 import { fetchCars } from '../services/fetchCars';
 import CarCard from '../components/carCard';
+import { absoluteFill } from 'react-native/types_generated/Libraries/StyleSheet/StyleSheetExports';
+import { event } from 'react-native/types_generated/Libraries/Animated/AnimatedExports';
+import GradientButton from '../components/GradientButton';
+import { Colors } from '../constants/colors';
 
 const { width } = Dimensions.get("window");
 
-export default function HomeScreen() {
+export default function HomeScreen({ navigation }) {
   const [refreshing, setRefreshing] = useState(false)
   const [userInfo, setUserInfo] = useState<User | null>(null)
   const [searchText, setSearchText] = useState('');
   const [cars, setCars] = useState([])
-
+  const insents = useSafeAreaInsets();
+  const [parentHeight, setParentHeight] = useState(0);
+  const [activeButton, setActiveButton] = useState("forRent")
   const placeholders = [
     'Where are you going today?',
     'Search for available cars',
@@ -46,7 +53,6 @@ export default function HomeScreen() {
       try {
         const data = await fetchCars();
         setCars(data);
-        console.log(data)
       } catch (error) {
         console.error("Error fetching cars:", error);
       }
@@ -88,13 +94,18 @@ async function fetchUserInfo() {
 
 
   return (
-    <SafeAreaView>
-        <ScrollView>
-              <View style={styles.header}>
-                  
-                      <View>
-                        <Text style={{ fontFamily: 'MyHeaderFontBold', fontSize: 30 }}>Hi, {userInfo?.name}</Text>
-                        <Text style={{ fontFamily: 'MySubHeaderFontSemiBold',  fontSize: 12, color: "gray"}}>Need car for today?</Text>
+       <ScrollView>
+           <LinearGradient
+      colors={["#4c669f", "#3b5998", "#192f6a"]} // gradient colors
+      style={styles.container}
+    >
+ <View style={[styles.header, {marginTop: insents.top}]}
+ onLayout={(event) => {
+  setParentHeight(event.nativeEvent.layout.height)
+ }}>
+                        <View>
+                        <Text style={{ fontFamily: 'MyHeaderFontBold', fontSize: 30, color: "white" }}>Hi, {userInfo?.name}</Text>
+                        <Text style={{ fontFamily: 'MySubHeaderFontSemiBold',  fontSize: 12, color: "white"}}>Need car for today?</Text>
                       </View>
                       <TouchableOpacity style={{marginLeft: "auto"}}>
                             <Image
@@ -106,50 +117,60 @@ async function fetchUserInfo() {
                         style={styles.serviceImage}
                       />
                       </TouchableOpacity>
-                 
-              </View>
-                 <TextInput
+                  </View>
+
+                      <TextInput
         value={searchText}
         onChangeText={setSearchText}
         placeholder={placeholders[currentIndex]}
         placeholderTextColor="#999"
         style={styles.input}
       />
-      <ScrollView horizontal
+    </LinearGradient>
+            
+            <View style={{padding: 20}}>
+ <ScrollView horizontal
       showsHorizontalScrollIndicator={false}
-      style={{gap: 20, marginTop: 20}}
+      style={styles.promoContainer}
       >
-                        <Image source={promo1} style={{ width: width, height: width * 0.56 }}
+                        <Image source={promo1} style={styles.promoImg}
   resizeMode="stretch"/>
-      <Image source={promo2} style={{ width: width, height: width * 0.56 }}
+      <Image source={promo2} style={styles.promoImg}
   resizeMode="stretch"/>
       </ScrollView>
+             </View>
+     
+     <View style={{flexDirection: "row", paddingInline: 20, gap:20}}>
+      <TouchableOpacity style={[styles.button, {backgroundColor: activeButton === "forRent" ? Colors.primary : "gray"}]}
+       onPress={() => setActiveButton("forRent")}>
+      <Text style={styles.buttonText}>For rent</Text>
+      </TouchableOpacity>
 
-<View style={{gap: 5, marginTop: 20, padding: 20}}>
-  <View style={{flexDirection:"row"}}>
-    <Text style={{fontFamily: 'MySubHeaderFontSemiBold'}}>For Rent</Text>
-    <Text style={{fontFamily: 'MyRegularFont', marginLeft: "auto", color: "blue"}}>View More ></Text>
-  </View>
-  
-  {cars.map((car) => (
-      <CarCard car={car}/>
-      ))}
-</View>
+        <TouchableOpacity style={[styles.button, {backgroundColor: activeButton === "forSale" ? Colors.primary : "gray"}]} 
+       onPress={() => setActiveButton("forSale")}>
+      <Text style={styles.buttonText}>For sale</Text>
+      </TouchableOpacity>
+     </View>
+      {activeButton === "forRent" &&
+      <View style={{gap: 5, padding: 20}}>
+       {cars.map((item) => (
+        <TouchableOpacity key={item.id} onPress={() => navigation.navigate("Details", { car: item })}>
+          <CarCard car={item}/>
+        </TouchableOpacity>
+            
+            ))}
+      </View>
+      }
 
-<View style={{gap: 5, marginTop: 20, padding: 20}}>
-  <View style={{flexDirection:"row"}}>
-    <Text style={{fontFamily: 'MySubHeaderFontSemiBold'}}>For Sale</Text>
-    <Text style={{fontFamily: 'MyRegularFont', marginLeft: "auto", color: "blue"}}>View More ></Text>
-  </View>
-  
-  {cars.map((car) => (
-      <CarCard car={car}/>
-      ))}
-</View>
-        
+      {activeButton === "forSale" &&
+      <View style={{alignContent: "center", justifyContent:"center", alignItems:"center", flex: 1, marginTop: 100}}>
+        <Text>Coming Soon!</Text>
+        </View>}
+
+
+
         
         </ScrollView>
-    </SafeAreaView>
    
 
   )
@@ -158,15 +179,15 @@ async function fetchUserInfo() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    gap: 24,
+    padding: 12,
+    paddingBottom: 80
   },
   header: {
     flexDirection: "row",
     gap: 24,
     alignContent: "center",
     alignItems: "center",
-    padding: 20
+    padding: 20,
   },
   cardContainer: {
     padding: 16,
@@ -191,4 +212,26 @@ const styles = StyleSheet.create({
     marginRight: 20,
     marginBottom: 10
   },
+  promoContainer: {
+      zIndex: 10,
+      marginTop: -90,
+      borderRadius: 10
+  },
+  promoImg: {
+    width: width,
+    height: width * 0.56 ,
+    resizeMode: "contain"
+  },
+  button: {
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  buttonText:{
+    color: Colors.white,
+    fontSize: 14,
+    fontFamily: 'MyRegularFont'
+  }
 });

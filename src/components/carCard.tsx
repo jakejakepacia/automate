@@ -1,5 +1,5 @@
 import { View, Text, Image, StyleSheet } from "react-native";
-
+import { Colors } from "../constants/colors";
 export default function CarCard({ car }) {
   const thumbnail =
     car.car_images?.find(img => img.is_thumbnail)?.image_url ||
@@ -58,15 +58,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 4,
+    fontFamily: 'MyHeaderFontBold'
   },
   carDetails: {
     fontSize: 12,
-    color: "#666",
+    color: Colors.secondary,
     marginBottom: 8,
   },
   carPrice: {
     fontSize: 14,
     fontWeight: "bold",
-    color: "#1E90FF",
+    color: Colors.primary,
   },
 });
