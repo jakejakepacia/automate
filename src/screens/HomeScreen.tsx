@@ -4,11 +4,20 @@ import { supabase } from '../../lib/supabase'
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import type { User } from '../types/user';
 import Octicons from '@expo/vector-icons/Octicons';
+import promo1 from '../../assets/promotions/promo-1.png';
+import promo2 from '../../assets/promotions/promo-2.png';
+import { Dimensions } from 'react-native';
+import { fetchCars } from '../services/fetchCars';
+import CarCard from '../components/carCard';
+
+const { width } = Dimensions.get("window");
 
 export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false)
   const [userInfo, setUserInfo] = useState<User | null>(null)
   const [searchText, setSearchText] = useState('');
+  const [cars, setCars] = useState([])
+
   const placeholders = [
     'Where are you going today?',
     'Search for available cars',
@@ -31,6 +40,20 @@ export default function HomeScreen() {
     fetchUserInfo()
   }, [])
 
+   useEffect(() => {
+    // Wrap async function inside useEffect
+    const loadCars = async () => {
+      try {
+        const data = await fetchCars();
+        setCars(data);
+        console.log(data)
+      } catch (error) {
+        console.error("Error fetching cars:", error);
+      }
+    };
+
+    loadCars();
+  }, []); 
  
 
 async function fetchUserInfo() {
@@ -92,6 +115,39 @@ async function fetchUserInfo() {
         placeholderTextColor="#999"
         style={styles.input}
       />
+      <ScrollView horizontal
+      showsHorizontalScrollIndicator={false}
+      style={{gap: 20, marginTop: 20}}
+      >
+                        <Image source={promo1} style={{ width: width, height: width * 0.56 }}
+  resizeMode="stretch"/>
+      <Image source={promo2} style={{ width: width, height: width * 0.56 }}
+  resizeMode="stretch"/>
+      </ScrollView>
+
+<View style={{gap: 5, marginTop: 20, padding: 20}}>
+  <View style={{flexDirection:"row"}}>
+    <Text style={{fontFamily: 'MySubHeaderFontSemiBold'}}>For Rent</Text>
+    <Text style={{fontFamily: 'MyRegularFont', marginLeft: "auto", color: "blue"}}>View More ></Text>
+  </View>
+  
+  {cars.map((car) => (
+      <CarCard car={car}/>
+      ))}
+</View>
+
+<View style={{gap: 5, marginTop: 20, padding: 20}}>
+  <View style={{flexDirection:"row"}}>
+    <Text style={{fontFamily: 'MySubHeaderFontSemiBold'}}>For Sale</Text>
+    <Text style={{fontFamily: 'MyRegularFont', marginLeft: "auto", color: "blue"}}>View More ></Text>
+  </View>
+  
+  {cars.map((car) => (
+      <CarCard car={car}/>
+      ))}
+</View>
+        
+        
         </ScrollView>
     </SafeAreaView>
    
