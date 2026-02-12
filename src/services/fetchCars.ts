@@ -12,6 +12,7 @@ export async function fetchCars() {
       transmission,
       seats,
       city,
+      province,
       car_pricing (
         price_per_day,
         price_per_week,

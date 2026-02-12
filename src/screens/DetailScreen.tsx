@@ -11,14 +11,19 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Colors } from "../constants/colors";
+import Modal from "react-native-modal";
+import ScheduleScreen from "./ScheduleScreen";
 
 const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
 
 export default function DetailScreen({ route, navigation }) {
     const { car } = route.params;
     const [favorite, setFavorite] = useState(false);
-
-    console.log(car)
+    const [isModalVisible, setModalVisible] = useState(false)
+    const [selectedCarId, setCardId] = useState(car.id)
+    const [selectedArea, setSelectedArea] = useState(car.province)
+    const [selectedCar, setSelectedCar] = useState(car)
+      const toggleModal = () => setModalVisible((prev) => !prev);
 
     const thumbnail =
         car.car_images?.find((img) => img.is_thumbnail)?.image_url ||
@@ -26,8 +31,17 @@ export default function DetailScreen({ route, navigation }) {
 
     const price = car.car_pricing?.[0]?.price_per_day;
 
+   const handleCloseModal = () => {
+    toggleModal();
+    // // Reload user data when modal closes (after successful login)
+    // setTimeout(() => {
+    //   loadUserData();
+    // }, 300);
+  };
+
+
     return (
-        <SafeAreaView style={styles.container}>
+       <SafeAreaView style={styles.container}>
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.iconBtn}>
                     <MaterialIcons name="arrow-back-ios" size={20} color={Colors.black} />
@@ -79,14 +93,38 @@ export default function DetailScreen({ route, navigation }) {
                             <Text style={styles.ownerName}>{car.users?.name || 'Unknown'}</Text>
                             <Text style={styles.ownerSub}>{car.users?.city || car.city}</Text>
                         </View>
+                        <TouchableOpacity style={styles.button}>
+                            <Text style={{color: "white"}}>Inquire</Text>
+                        </TouchableOpacity>
 
                         
                     </View>
                 </View>
 
-                <View style={{height: 40}} />
+            <View>
+                    <TouchableOpacity style={[styles.button , {marginTop: 20}]} onPress={() => setModalVisible(true)}>
+                        <Text style={{color: "white"}}>Rent Car</Text>
+                     </TouchableOpacity>
+
+                   <Modal isVisible={isModalVisible}
+                         onBackButtonPress={handleCloseModal}
+                             swipeDirection="down"
+                             onSwipeComplete={handleCloseModal}
+                                   style={{ justifyContent: "flex-end", margin: 0 }}>
+                         <View style={styles.modalContainer}>
+                             <ScheduleScreen car={selectedCar} />
+                         </View>
+
+        </Modal>
+            </View>
+                 
+    
+
             </ScrollView>
+
+            
         </SafeAreaView>
+     
     );
 }
 
@@ -127,4 +165,19 @@ const styles = StyleSheet.create({
     ownerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
     ownerName: { fontSize: 15, fontWeight: '700' },
     ownerSub: { fontSize: 12, color: Colors.secondary, marginTop: 4 },
+    button: {
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: Colors.primary,
+
+  },
+    modalContainer: {
+    height: "90%",
+    backgroundColor: "white",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
 });

@@ -12,6 +12,7 @@ import Feather from '@expo/vector-icons/Feather';
 
 import { useFonts } from 'expo-font'
 import DetailScreen from './src/screens/DetailScreen'
+import ScheduleScreen from './src/screens/ScheduleScreen'
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
 
@@ -71,16 +72,3 @@ export default function App() {
   )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    paddingTop: 50,
-    paddingHorizontal: 16,
-  },
-  item: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-})

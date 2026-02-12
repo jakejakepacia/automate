@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { View, Text, FlatList, StyleSheet, RefreshControl, ScrollView, Image, TouchableOpacity, TextInput, Button } from 'react-native'
+import { View, Text, FlatList, StyleSheet, RefreshControl, ScrollView, Image, TouchableOpacity, TextInput, ActivityIndicator } from 'react-native'
 import { supabase } from '../../lib/supabase'
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import type { User } from '../types/user';
@@ -49,18 +49,27 @@ export default function HomeScreen({ navigation }) {
 
    useEffect(() => {
     // Wrap async function inside useEffect
+
+    loadCars();
+  }, []); 
+
     const loadCars = async () => {
       try {
+        setRefreshing(true)
         const data = await fetchCars();
         setCars(data);
       } catch (error) {
         console.error("Error fetching cars:", error);
+      } finally{
+            setRefreshing(false)
       }
     };
-
-    loadCars();
-  }, []); 
  
+  function forRentBtnPressed () {
+     setActiveButton("forRent")
+      loadCars()
+      
+  }
 
 async function fetchUserInfo() {
   try {
@@ -142,7 +151,7 @@ async function fetchUserInfo() {
      
      <View style={{flexDirection: "row", paddingInline: 20, gap:20}}>
       <TouchableOpacity style={[styles.button, {backgroundColor: activeButton === "forRent" ? Colors.primary : "gray"}]}
-       onPress={() => setActiveButton("forRent")}>
+       onPress={() => forRentBtnPressed() }>
       <Text style={styles.buttonText}>For rent</Text>
       </TouchableOpacity>
 
@@ -151,6 +160,10 @@ async function fetchUserInfo() {
       <Text style={styles.buttonText}>For sale</Text>
       </TouchableOpacity>
      </View>
+     {refreshing && 
+     <ActivityIndicator />
+
+     }
       {activeButton === "forRent" &&
       <View style={{gap: 5, padding: 20}}>
        {cars.map((item) => (
