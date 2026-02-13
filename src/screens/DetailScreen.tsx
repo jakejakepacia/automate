@@ -94,7 +94,7 @@ export default function DetailScreen({ route, navigation }) {
                             <Text style={styles.ownerSub}>{car.users?.city || car.city}</Text>
                         </View>
                         <TouchableOpacity style={styles.button}>
-                            <Text style={{color: "white"}}>Inquire</Text>
+                            <Text style={{color: "white"}}>Message</Text>
                         </TouchableOpacity>
 
                         
@@ -103,16 +103,14 @@ export default function DetailScreen({ route, navigation }) {
 
             <View>
                     <TouchableOpacity style={[styles.button , {marginTop: 20}]} onPress={() => setModalVisible(true)}>
-                        <Text style={{color: "white"}}>Rent Car</Text>
+                        <Text style={{color: "white"}}>Inquire Now</Text>
                      </TouchableOpacity>
 
                    <Modal isVisible={isModalVisible}
-                         onBackButtonPress={handleCloseModal}
-                             swipeDirection="down"
-                             onSwipeComplete={handleCloseModal}
                                    style={{ justifyContent: "flex-end", margin: 0 }}>
                          <View style={styles.modalContainer}>
-                             <ScheduleScreen car={selectedCar} />
+                             <ScheduleScreen car={selectedCar} 
+                                    onClose={handleCloseModal} />
                          </View>
 
         </Modal>

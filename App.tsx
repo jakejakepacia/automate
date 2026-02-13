@@ -8,11 +8,13 @@ import { NavigationContainer } from '@react-navigation/native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import Feather from '@expo/vector-icons/Feather';
 
 import { useFonts } from 'expo-font'
 import DetailScreen from './src/screens/DetailScreen'
 import ScheduleScreen from './src/screens/ScheduleScreen'
+import VehiclesScreen from './src/screens/VehiclesScreen'
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
 
@@ -44,6 +46,10 @@ export default function App() {
           <Feather name="home" size={size} color={color} />
         ),
         }}/>
+          <Tab.Screen name="Vehicles" component={VehiclesScreen} options={{tabBarIcon: ({ color, size }) => (
+          <Ionicons name="car-outline" size={size} color={color} />
+        ),
+        }}/>
         <Tab.Screen
           name="Profile"
           children={() => (
@@ -59,6 +65,7 @@ export default function App() {
             <MaterialCommunityIcons name="account-circle-outline" size={size} color={color} />
           )}}
         />
+       
       </Tab.Navigator>
   )
 

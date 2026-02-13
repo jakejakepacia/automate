@@ -14,6 +14,7 @@ import { absoluteFill } from 'react-native/types_generated/Libraries/StyleSheet/
 import { event } from 'react-native/types_generated/Libraries/Animated/AnimatedExports';
 import GradientButton from '../components/GradientButton';
 import { Colors } from '../constants/colors';
+import { fetchUserInfo } from '../services/api';
 
 const { width } = Dimensions.get("window");
 
@@ -43,8 +44,8 @@ export default function HomeScreen({ navigation }) {
     return () => clearInterval(interval); // cleanup on unmount
   }, []);
 
-  useEffect(() => {
-    fetchUserInfo()
+  useEffect(() =>  {
+    loadUserInfo();
   }, [])
 
    useEffect(() => {
@@ -52,6 +53,18 @@ export default function HomeScreen({ navigation }) {
 
     loadCars();
   }, []); 
+
+    const loadUserInfo = async () =>{
+      try{
+        setRefreshing(true)
+        const data = await fetchUserInfo();
+        setUserInfo(data)
+      }catch (error){
+        console.error("Error fetching user info", error)
+      }finally{
+        setRefreshing(false)
+      }
+    }
 
     const loadCars = async () => {
       try {
@@ -71,35 +84,6 @@ export default function HomeScreen({ navigation }) {
       
   }
 
-async function fetchUserInfo() {
-  try {
-    setRefreshing(true)
-
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      console.error('No authenticated user')
-      return
-    }
-
-    const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', user.id)
-      .single()
-
-    if (error) {
-      console.error('Error fetching user info:', error.message)
-    } else {
-       setUserInfo(data) 
-    }
-  } finally {
-    setRefreshing(false)
-  }
-}
 
 
   return (

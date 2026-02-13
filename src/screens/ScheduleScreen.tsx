@@ -2,18 +2,31 @@ import React, { useState } from "react";
 import {
   View, Text,
   StyleSheet,
-  ScrollView
+  ScrollView,
+  TouchableOpacity,
+  Image
 } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { Colors } from "../constants/colors";
-
-export default function ScheduleScreen( { car }){
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import requestSuccessIcon from "../../assets/success/booked_success.jpg"
+import BookingNextSteps from "../components/bookingNextSteps";
+import { fetchUserInfo, addBooking } from "../services/api";
+import { supabase } from "../../lib/supabase";
+export default function ScheduleScreen( { car, onClose }){
      const [selectedDate, setSelectedDate] = useState("");
     const today = new Date().toISOString().split("T")[0];
      const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
     const [activePricing, setActivePricing] = useState("")
-console.log(car)
+    const [requestedBooking, setRequestedBooking] = useState(false)
+    const [confirmBtnText, setConfirmBtnText] = useState("Request Booking")
+
+     const handleConfirm = () => {
+    // do something (select date etc)
+    onClose();  // 👈 close modal
+  };
+
    const getMarkedDates = () => {
     let marked = {};
 
@@ -104,7 +117,7 @@ const calculateTotalPrice = (totalDays, pricePerDay, pricePerWeek, pricePerMonth
 
   const weeks = Math.floor(remainingAfterMonths / 7);
   const remainingDays = remainingAfterMonths % 7;
-
+  
   const totalPrice =
     months * pricePerMonth +
     weeks * pricePerWeek +
@@ -140,33 +153,73 @@ if (days < 7) {
   );
 }
 
+const requestBooking = async () => {
+  if (!requestedBooking){
+
+    const session = await supabase.auth.getSession();
+const userId = session.data?.session?.user.id;
+
+    const newBooking = {
+        car_id: car.id,
+  renter_id: userId,
+  start_date: startDate, // always YYYY-MM-DD
+  end_date: endDate,
+  total_price: rentAmount,
+  initial_price: rentAmount,
+    }
+
+    const result = await addBooking(newBooking);
+
+    if (result){
+     setConfirmBtnText("Confirm")
+      setRequestedBooking(true)
+    }
+ 
+  }else{
+    handleConfirm()
+  }
+
+}
+
 
 
 return(
-    <ScrollView style= {{padding: 16}}>
-        <View style={{marginTop: 20, gap: 15}}>
-    <Text style={{textAlign: "center"}}>Rental Pricing</Text>
-    <View style={{flexDirection: "row", gap: 10}}>
-        <View style={[styles.column, styles.priceContainer, activePricing === "perday" ? { backgroundColor : Colors.primary } : {backgroundColor : Colors.gray} ]}>
-            <Text style={styles.priceText}>Per day</Text>
-            <Text style={styles.priceText}>{formatPHP(car?.car_pricing?.[0].price_per_day)} </Text>
-        </View>
+  <View style= {{flex: 1}}>
+    <TouchableOpacity style={{position: "absolute",
+      right: 20,
+      top: 20,
+      zIndex: 100
+    }}
+    onPress={onClose}>
+ <FontAwesome name="close" size={30} color="black" />
+    </TouchableOpacity>
+   
+ <ScrollView style= {{padding: 16, flex: 1}}>
+  {!requestedBooking && 
+  <View>
+  <View style={{marginTop: 20, gap: 15}}>
+        <Text style={{textAlign: "center"}}>Rental Pricing</Text>
+          <View style={{flexDirection: "row", gap: 10}}>
+            <View style={[styles.column, styles.priceContainer, activePricing === "perday" ? { backgroundColor : Colors.primary } : {backgroundColor : Colors.gray} ]}>
+                <Text style={styles.priceText}>Per day</Text>
+                <Text style={styles.priceText}>{formatPHP(car?.car_pricing?.[0].price_per_day)} </Text>
+             </View>
 
-        <View style={[styles.column, styles.priceContainer]}>
-            <Text style={styles.priceText}>Per week</Text>
-            <Text style={styles.priceText}>{formatPHP(car?.car_pricing?.[0].price_per_week) }</Text>
-        </View>
+             <View style={[styles.column, styles.priceContainer]}>
+                <Text style={styles.priceText}>Per week</Text>
+                <Text style={styles.priceText}>{formatPHP(car?.car_pricing?.[0].price_per_week) }</Text>
+              </View>
 
-        <View style={[styles.column, styles.priceContainer]}>
-            <Text style={styles.priceText}>Per Month</Text>
-            <Text style={styles.priceText}>{formatPHP(car?.car_pricing?.[0].price_per_month) }</Text>
-        </View>
-    </View>
-</View>
+            <View style={[styles.column, styles.priceContainer]}>
+                <Text style={styles.priceText}>Per Month</Text>
+                <Text style={styles.priceText}>{formatPHP(car?.car_pricing?.[0].price_per_month) }</Text>
+            </View>
+          </View>
+      </View>
     <View style={{ flex: 1 }}>
         <Text>{selectedDate}</Text>
-      <Calendar
-        minDate={today}
+        <Calendar
+           minDate={today}
          markingType="period"
         onDayPress={onDayPress}
         markedDates={getMarkedDates()}
@@ -187,10 +240,10 @@ return(
           textMonthFontWeight: "bold",
           textDayFontWeight: "500",
           textMonthFontSize: 20,
-        }}
-      />
+         }} />
 
-<View style={styles.infoContainer}>
+        <View style={{gap: 20}}>
+  <View style={styles.infoContainer}>
   <View style={styles.column}>
             <Text style={styles.infoTitle}>Total Days</Text>
             {startDate && endDate && (
@@ -214,12 +267,39 @@ return(
 <View style={styles.column}>
   <Text style={styles.infoTitle}>Rent Amount</Text>
   <Text style={styles.info}>{formatPHP(rentAmount)}</Text>
+  <Text style={styles.infoTitle}>Amount may varies</Text>
 </View>
 
+        </View>
 
-</View>
-    </ScrollView>
+       
+    </View>
+  </View>
+   
+  }
+
+  {requestedBooking && 
+  <View >
   
+  
+     <View>
+      <BookingNextSteps />
+    </View>
+  </View>
+  
+
+  }
+ 
+
+  
+    </ScrollView>
+
+    <TouchableOpacity style={[styles.button,  styles.buttonPosition]} onPress={() => requestBooking()}>
+          <Text style={styles.buttonText}>{confirmBtnText}</Text>
+        </TouchableOpacity>
+  </View>
+   
+   
       
 
 )
@@ -256,5 +336,25 @@ const styles = StyleSheet.create({
         color: Colors.secondary,
         fontFamily: 'MySubHeaderFontSemiBold',
         fontSize: 12
-    }
+    },
+     button: {
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: Colors.primary,
+
+  },
+  buttonText: {
+ color:"white",
+        fontFamily: 'MySubHeaderFontSemiBold',
+        fontSize: 16
+  },
+  buttonPosition:{
+    position: "absolute",
+    bottom: 40,
+    left: 20,
+    right: 20,
+  }
 })
