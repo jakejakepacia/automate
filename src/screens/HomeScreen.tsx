@@ -8,13 +8,12 @@ import Octicons from '@expo/vector-icons/Octicons';
 import promo1 from '../../assets/promotions/promo-1.png';
 import promo2 from '../../assets/promotions/promo-2.png';
 import { Dimensions } from 'react-native';
-import { fetchCars } from '../services/fetchCars';
 import CarCard from '../components/carCard';
 import { absoluteFill } from 'react-native/types_generated/Libraries/StyleSheet/StyleSheetExports';
 import { event } from 'react-native/types_generated/Libraries/Animated/AnimatedExports';
 import GradientButton from '../components/GradientButton';
 import { Colors } from '../constants/colors';
-import { fetchUserInfo } from '../services/api';
+import { fetchUserInfo, fetchCars } from '../services/api';
 
 const { width } = Dimensions.get("window");
 

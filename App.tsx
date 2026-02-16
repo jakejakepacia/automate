@@ -15,6 +15,8 @@ import { useFonts } from 'expo-font'
 import DetailScreen from './src/screens/DetailScreen'
 import ScheduleScreen from './src/screens/ScheduleScreen'
 import VehiclesScreen from './src/screens/VehiclesScreen'
+import VehicleFormScreen from './src/screens/VehicleFormScreen'
+import { PaperProvider, Provider } from 'react-native-paper'
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
 
@@ -70,12 +72,16 @@ export default function App() {
   )
 
   return (
+    <PaperProvider>
     <NavigationContainer>
       <Stack.Navigator screenOptions={{headerShown: false}}>
         <Stack.Screen name="Tabs" component={MyTabs} />
         <Stack.Screen name="Details" component={DetailScreen}/>
+        <Stack.Screen name="VehicleForm" component={VehicleFormScreen}/>
       </Stack.Navigator>
     </NavigationContainer>
+    </PaperProvider>
+
   )
 }
 

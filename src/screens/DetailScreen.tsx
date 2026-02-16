@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import {
     View,
     Text,
@@ -7,12 +7,15 @@ import {
     ScrollView,
     Image,
     Dimensions,
+    ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Colors } from "../constants/colors";
 import Modal from "react-native-modal";
 import ScheduleScreen from "./ScheduleScreen";
+import { fetchBookings } from "../services/api";
+import { formatPHP } from "../constants/formatPHP";
 
 const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
 
@@ -20,16 +23,23 @@ export default function DetailScreen({ route, navigation }) {
     const { car } = route.params;
     const [favorite, setFavorite] = useState(false);
     const [isModalVisible, setModalVisible] = useState(false)
-    const [selectedCarId, setCardId] = useState(car.id)
-    const [selectedArea, setSelectedArea] = useState(car.province)
     const [selectedCar, setSelectedCar] = useState(car)
       const toggleModal = () => setModalVisible((prev) => !prev);
-
+    const [requestedBooking, setRequestedBooking] = useState(false);
+    const [successRequestBooking, setSuccessRequestBook] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [bookingDetails, setBookingDetails] = useState(null)
     const thumbnail =
         car.car_images?.find((img) => img.is_thumbnail)?.image_url ||
         car.car_images?.[0]?.image_url;
 
     const price = car.car_pricing?.[0]?.price_per_day;
+
+
+useEffect(() => {
+ 
+  loadBookings();
+}, []);
 
    const handleCloseModal = () => {
     toggleModal();
@@ -39,11 +49,55 @@ export default function DetailScreen({ route, navigation }) {
     // }, 300);
   };
 
+   const loadBookings = async () => {
+    try {
+        setIsLoading(true)
+    const result = await fetchBookings();
+    const booking = result.find( booking => booking.car_id === car.id );
+    
+    if (booking != null) {
+        setRequestedBooking(true);
+        setBookingDetails(booking)
+        console.log("booking details, ", bookingDetails)
+     }
 
+    } catch (error) {
+      console.log(error);
+    } finally{
+        setIsLoading(false);
+    }
+  };
+
+
+  const handleBookingRequested = () => {
+    loadBookings();
+    setSuccessRequestBook(true);
+  }
+
+  const handleBackNavigation = () => {
+    if (successRequestBooking){
+        navigation.navigate('Tabs', {
+  screen: 'Vehicles',
+  params: { shouldRefresh: true },
+}
+);
+
+    }else{
+         navigation.goBack()
+    }
+  }
+
+  const handleConfirmButton= () => {
+    if(requestedBooking){
+
+    }else{
+      setModalVisible(true)
+    }
+  }
     return (
        <SafeAreaView style={styles.container}>
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.iconBtn}>
+                <TouchableOpacity onPress={handleBackNavigation} style={styles.iconBtn}>
                     <MaterialIcons name="arrow-back-ios" size={20} color={Colors.black} />
                 </TouchableOpacity>
 
@@ -101,16 +155,54 @@ export default function DetailScreen({ route, navigation }) {
                     </View>
                 </View>
 
+                {requestedBooking &&
+                     <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>Booking Details</Text>
+                            <View style={styles.ownerRow}>
+                                <View>
+                                    
+                                    <Text style={styles.ownerSub}>   {`From: ${bookingDetails.start_date || '-'} • To: ${bookingDetails.end_date || '-'}`}</Text>
+                               
+                                <Text style={styles.ownerSub}>   {`Initial Amount: ${formatPHP(bookingDetails.initial_price) || '-'}`}</Text>
+                                <Text style={styles.ownerSub}>   {`Status: ${bookingDetails.status || '-'}`}</Text> 
+                                <Text style={styles.ownerSub}>   {`Total Amount: ${formatPHP(bookingDetails.total_price) || '-' } (waitng for the owner to confirm)`}</Text>
+                          
+                                 </View>
+                                {/* <TouchableOpacity style={styles.button}>
+                                    <Text style={{color: "white"}}>Cancel</Text>
+                                </TouchableOpacity> */}
+                
+
+                                    </View>
+                                </View>
+                }
+            
+
             <View>
-                    <TouchableOpacity style={[styles.button , {marginTop: 20}]} onPress={() => setModalVisible(true)}>
-                        <Text style={{color: "white"}}>Inquire Now</Text>
-                     </TouchableOpacity>
+                 <TouchableOpacity
+                    style={[
+                      styles.button,
+                      { marginTop: 20, backgroundColor: requestedBooking ? "darkgrey" : Colors.primary },
+                    ]}
+                    onPress={handleConfirmButton}
+                    disabled={isLoading} // optional: prevent multiple taps 
+                    >                   
+                    {isLoading ? (
+                      <ActivityIndicator size="small" color="#fff" /> // smaller size
+                    ) : (
+                      <Text style={{ color: "white" }}>
+                        {requestedBooking ? "Submitted Booking" : "Inquire"}
+                      </Text>
+                    )}
+                    </TouchableOpacity>
+
 
                    <Modal isVisible={isModalVisible}
                                    style={{ justifyContent: "flex-end", margin: 0 }}>
                          <View style={styles.modalContainer}>
                              <ScheduleScreen car={selectedCar} 
-                                    onClose={handleCloseModal} />
+                                    onClose={handleCloseModal}
+                                    onBookingRequested={handleBookingRequested} />
                          </View>
 
         </Modal>
@@ -170,8 +262,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: Colors.primary,
-
   },
+
     modalContainer: {
     height: "90%",
     backgroundColor: "white",

@@ -13,7 +13,9 @@ import requestSuccessIcon from "../../assets/success/booked_success.jpg"
 import BookingNextSteps from "../components/bookingNextSteps";
 import { fetchUserInfo, addBooking } from "../services/api";
 import { supabase } from "../../lib/supabase";
-export default function ScheduleScreen( { car, onClose }){
+import { formatPHP } from "../constants/formatPHP";
+
+export default function ScheduleScreen( { car, onClose, onBookingRequested }){
      const [selectedDate, setSelectedDate] = useState("");
     const today = new Date().toISOString().split("T")[0];
      const [startDate, setStartDate] = useState(null);
@@ -23,7 +25,7 @@ export default function ScheduleScreen( { car, onClose }){
     const [confirmBtnText, setConfirmBtnText] = useState("Request Booking")
 
      const handleConfirm = () => {
-    // do something (select date etc)
+    onBookingRequested();
     onClose();  // 👈 close modal
   };
 
@@ -124,15 +126,6 @@ const calculateTotalPrice = (totalDays, pricePerDay, pricePerWeek, pricePerMonth
     remainingDays * pricePerDay;
 
   return totalPrice;
-};
-
-const formatPHP = (amount) => {
-  return new Intl.NumberFormat("en-PH", {
-    style: "currency",
-    currency: "PHP",
-    minimumFractionDigits: 0, // no decimals
-    maximumFractionDigits: 0,
-  }).format(amount);
 };
 
 const days = getDayDifference();
