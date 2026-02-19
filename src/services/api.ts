@@ -177,3 +177,43 @@ const {
   }
    
 }
+export async function addCar(newCar: {
+    make: string;
+    model: string;
+    year: string;
+    color: string;
+    plate_number: string;
+    category: string;
+    transmission: string;
+    fuel_type: string;
+    seats: number;
+    city: string;
+    province: string;
+    pickup_location: string;
+    latitude: number;
+    longitude: number
+
+}) {
+
+ const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
+  
+
+      // Add user_id to the object
+  const carWithUser = {
+    ...newCar,
+    owner_id: user.id,
+  };
+  console.log("new car: ", newCar)
+
+    const { data, error} = await supabase.from("cars").insert([carWithUser]).select();
+
+    if (error){
+        console.error("Error adding booking", error.message);
+        return null;
+    }
+
+    return data;
+}
