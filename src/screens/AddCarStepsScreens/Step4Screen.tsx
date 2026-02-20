@@ -8,7 +8,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useState } from "react";
 import ImageGrid from "../../components/ImageGrid";
 
-export default function Step4Screen(){
+export default function Step4Screen( { images, setImages }){
     const requestPermissions = async () => {
   const cameraPermission = await ImagePicker.requestCameraPermissionsAsync();
   const mediaPermission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -44,6 +44,11 @@ const openCamera = async () => {
  if (!result.canceled) {
   const newImages = result.assets.map(asset => asset.uri);
   setImages(prev => [...prev, ...newImages]);
+
+  setFormData(prev => ({
+  ...prev,
+  images: [...prev.images, result.assets[0].uri],
+}));
 }
 
 };
@@ -66,11 +71,14 @@ const openGallery = async () => {
  if (!result.canceled) {
   const newImages = result.assets.map(asset => asset.uri);
   setImages(prev => [...prev, ...newImages]);
+
+  setFormData(prev => ({
+  ...prev,
+  images: [...prev.images, result.assets[0].uri],
+}));
 }
 
 };
-
-const [images, setImages] = useState<string[]>([]);
 
 
     return(

@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context"
 import NavigationBar from "../components/NavigationBar"
 import { Colors } from "../constants/colors"
 import { useState, useEffect, useRef } from "react"
-import { addCar } from "../services/api"
+import { addCar, uploadCarImage } from "../services/api"
 import Step1Screen from "./AddCarStepsScreens/Step1Screen"
 import Step2Screen from "./AddCarStepsScreens/Step2Screen"
 import Step3Screen
@@ -18,7 +18,7 @@ export default function VehicleFormScreen( { navigation } ){
      const totalSteps = 4;
      const [step, setStep] = useState(1);
      const progress = step / totalSteps
-  const animatedValue = useRef(new Animated.Value(0)).current;
+     const animatedValue = useRef(new Animated.Value(0)).current;
        useEffect(() => {
     Animated.timing(animatedValue, {
       toValue: progress,
@@ -31,7 +31,7 @@ export default function VehicleFormScreen( { navigation } ){
     inputRange: [0, 1],
     outputRange: [0, screenWidth - 72 - 70], // padding + approx text width
   });
-
+  const [carImages, setCarImages] = useState<string[]>([])
   const [formData, setFormData] = useState({
   // Step 1
   make: '',
@@ -87,8 +87,7 @@ export default function VehicleFormScreen( { navigation } ){
             
           } else {
             console.log("try to add")
-              console.log(formData);
-               submitNewCarForm();
+            submitNewCarForm();
           }
 
      }
@@ -107,6 +106,12 @@ export default function VehicleFormScreen( { navigation } ){
 
           if (result){
                console.log("added car : ", result)
+               //upload images, 
+               console.log("first image uri ",carImages[0])
+                const result = await uploadCarImage(carImages[0])
+
+               //get url image from supabase using path
+              //add data to car_images table
           }
      }
 
@@ -123,7 +128,7 @@ export default function VehicleFormScreen( { navigation } ){
                     {step === 1 && <Step1Screen formData={formData} setFormData={setFormData}  />}
                     {step === 2 && <Step2Screen formData={formData} setFormData={setFormData}  />}
                     {step === 3 && <Step3Screen formData={formData} setFormData={setFormData} />}
-                    {step ===4 &&  <Step4Screen />}
+                    {step ===4 &&  <Step4Screen images={carImages} setImages={setCarImages} />}
 
               </ScrollView>
               

@@ -192,7 +192,6 @@ export async function addCar(newCar: {
     pickup_location: string;
     latitude: number;
     longitude: number
-
 }) {
 
  const {
@@ -206,14 +205,49 @@ export async function addCar(newCar: {
     ...newCar,
     owner_id: user.id,
   };
-  console.log("new car: ", newCar)
 
     const { data, error} = await supabase.from("cars").insert([carWithUser]).select();
 
     if (error){
-        console.error("Error adding booking", error.message);
+        console.error("Error adding cars ", error.message);
         return null;
     }
 
+    console.log(data)
     return data;
 }
+
+const uriToBlob = async (uri) => {
+  const response = await fetch(uri);
+  const blob = await response.blob();
+  return blob;
+};
+
+export async function uploadCarImage(imageUri){
+  const user = (await supabase.auth.getUser()).data.user;
+
+  if (!user) throw new Error("User not logged in");
+
+     // Convert file:// → binary
+  const response = await fetch(imageUri)
+  const arrayBuffer = await response.arrayBuffer()
+
+   const fileName = `${Date.now()}.jpeg`
+  const filePath = `${user.id}/${fileName}`
+
+  console.log("file path ", filePath)
+  const { data, error } = await supabase.storage
+    .from('car_images')
+    .upload(filePath, arrayBuffer, {
+      contentType: 'image/jpeg',
+    })
+
+  if (error) {
+    console.log(error.message)
+    console.log(error)
+    throw error;
+  }
+
+  console.log(data)
+  return data;
+};

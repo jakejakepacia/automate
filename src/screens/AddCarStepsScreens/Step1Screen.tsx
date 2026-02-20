@@ -6,7 +6,7 @@ export default function Step1Screen({ formData, setFormData }){
             <View style={{gap: 10}}>
 
             <View>
-              <Text style={{fontFamily: 'MyHeaderFontBold', fontSize: 20}}>Step 1: Basic Information </Text>
+            <Text style={{fontFamily: 'MyHeaderFontBold', fontSize: 20}}>       Step 1: Basic Information </Text>
             <Text style={{fontFamily: 'MyHeaderFontRegular', fontSize: 16}}>Enter the basic information exactly as it appears on the vehicle registration.</Text>
             </View>
               
