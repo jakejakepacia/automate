@@ -59,16 +59,58 @@ export default function VehicleFormScreen( { navigation } ){
       3: ['city', 'province', 'pickup_location'],
     };
 
+    const isValidYear = (year) => {
+  const currentYear = new Date().getFullYear();
+
+  // Check if it's exactly 4 digits
+  if (!/^\d{4}$/.test(year)) {
+    return false;
+  }
+
+  const numericYear = parseInt(year, 10);
+
+  // Adjust range if needed
+  if (numericYear < 1900 || numericYear > currentYear) {
+    return false;
+  }
+
+  return true;
+};
+
     const validateStep = (currentStep: number) => {
     const fields = stepFields[currentStep];
   
     if(!fields){
       return true
     }
+    
+    if (currentStep === 1){
+       
+    }
 
+    switch (currentStep){
+      case 1:
+          if (!isValidYear(formData.year)){
+            alert("Please enter valid year")
+
+            return false;
+          }
+      case 2:
+
+          default:
+            console.log("try")
+    }
+
+    //Check if all fields are not empty
     return fields.every((field) => {
     const value = formData[field];
-    return value !== '' && value !== null && value !== 0;
+    const isValid = value !== '' && value !== null && value !== 0;
+
+    if (!isValid){
+      alert("Please enter all values")
+    }
+
+    return isValid
   });
 };
 
@@ -78,7 +120,6 @@ export default function VehicleFormScreen( { navigation } ){
         const isValid = validateStep(step);
           
           if (!isValid) {
-             alert("Please fill in all required fields.");
              return;
           }
        
@@ -100,6 +141,19 @@ export default function VehicleFormScreen( { navigation } ){
         setStep(step - 1)
      }
 
+     const uploadAllImages = async () => {
+  try {
+    console.log("images: ", carImages)
+    const results = await Promise.all(
+      carImages.map(image => uploadCarImage(image))
+    );
+
+    console.log('All uploads finished:', results);
+  } catch (error) {
+    console.error('Upload failed:', error);
+  }
+};
+
      async function submitNewCarForm(){
        
           const result = await addCar(formData); 
@@ -107,9 +161,7 @@ export default function VehicleFormScreen( { navigation } ){
           if (result){
                console.log("added car : ", result)
                //upload images, 
-               console.log("first image uri ",carImages[0])
-                const result = await uploadCarImage(carImages[0])
-
+               uploadAllImages();
                //get url image from supabase using path
               //add data to car_images table
           }

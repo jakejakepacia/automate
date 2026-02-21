@@ -213,7 +213,6 @@ export async function addCar(newCar: {
         return null;
     }
 
-    console.log(data)
     return data;
 }
 
@@ -235,7 +234,6 @@ export async function uploadCarImage(imageUri){
    const fileName = `${Date.now()}.jpeg`
   const filePath = `${user.id}/${fileName}`
 
-  console.log("file path ", filePath)
   const { data, error } = await supabase.storage
     .from('car_images')
     .upload(filePath, arrayBuffer, {
@@ -248,6 +246,5 @@ export async function uploadCarImage(imageUri){
     throw error;
   }
 
-  console.log(data)
   return data;
 };

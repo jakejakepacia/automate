@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { Suspense, useEffect, useState } from 'react'
 import { View, Text, FlatList, StyleSheet, RefreshControl, ScrollView, Image, TouchableOpacity, TextInput, ActivityIndicator } from 'react-native'
 import { supabase } from '../../lib/supabase'
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
@@ -84,7 +84,6 @@ export default function HomeScreen({ navigation }) {
   }
 
 
-
   return (
        <ScrollView>
            <LinearGradient
@@ -143,15 +142,15 @@ export default function HomeScreen({ navigation }) {
       <Text style={styles.buttonText}>For sale</Text>
       </TouchableOpacity>
      </View>
-     {refreshing && 
-     <ActivityIndicator />
-
-     }
+  
       {activeButton === "forRent" &&
       <View style={{gap: 5, padding: 20}}>
        {cars.map((item) => (
         <TouchableOpacity key={item.id} onPress={() => navigation.navigate("Details", { car: item })}>
-          <CarCard car={item}/>
+          <Suspense fallback={<ActivityIndicator />}>
+                <CarCard car={item}/>
+          </Suspense>
+         
         </TouchableOpacity>
             
             ))}

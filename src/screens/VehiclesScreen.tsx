@@ -10,7 +10,7 @@ import {
     ScrollView,
 } from "react-native";
 import { supabase } from "../../lib/supabase";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { fetchBookings, fetchOwnedCars } from "../services/api";
 import CarCard from "../components/carCard";
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -21,6 +21,7 @@ export default function VehiclesScreen({ navigation }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [cars, setCars] = useState([])
+  const insents = useSafeAreaInsets();
 
     useEffect(() => {
         if (tab === "renting") loadRenting();
@@ -56,6 +57,15 @@ export default function VehiclesScreen({ navigation }) {
         setTab("owned")
     }
 
+    function renderOwneCars( { item}: { item: any}){
+         
+        return(
+           <TouchableOpacity key={item.id} onPress={() => navigation.navigate("Details", { car: item })}>
+                             <CarCard car={item}/>
+                           </TouchableOpacity>
+        )
+    }
+
     function renderBooking({ item }: { item: any }) {
         const car = item.cars || null;
         const thumbnail = car?.car_images?.find((img: any) => img.is_thumbnail)?.image_url;
@@ -87,8 +97,7 @@ export default function VehiclesScreen({ navigation }) {
     }
 
     return (
-        <SafeAreaView style={{flex: 1}}>
-          <View style={styles.container}>
+          <View style={[styles.container, {marginTop: insents.top}]}>
             <View style={styles.tabRow}>
                 <TouchableOpacity
                     style={[styles.tab, tab === "renting" ? styles.tabActive : null]}
@@ -113,34 +122,24 @@ export default function VehiclesScreen({ navigation }) {
                     ) : bookings.length === 0 ? (
                         <Text style={styles.empty}>No bookings found</Text>
                     ) : (
-                        <FlatList data={bookings} keyExtractor={(i) => i.id} renderItem={renderBooking} />
+                        <FlatList data={bookings} keyExtractor={(i) => i.id} renderItem={renderBooking} style={{padding: 2}} />
                     )
                 ) : (
                     <View style={{gap: 5, flex: 1}}>
-                        <View style={{flex: 1}}>
-                                    {cars.map((item) => (
-                           <TouchableOpacity key={item.id} onPress={() => navigation.navigate("Details", { car: item })}>
-                             <CarCard car={item}/>
-                           </TouchableOpacity>
-                               
-                               ))}
-
-                            </View>
-                  
-                                 <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate("VehicleForm")}>
-                                                   <Ionicons name="add-circle-sharp" size={80} color={Colors.primary} />
-                                               </TouchableOpacity>
-                         </View>
+                          <FlatList data={cars} keyExtractor={(i) => i.id} renderItem={renderOwneCars} showsVerticalScrollIndicator={false} style={{padding: 2}}/>
+                            <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate("VehicleForm")}>
+                                    <Ionicons name="add-circle-sharp" size={80} color={Colors.primary} />
+                            </TouchableOpacity>
+                    </View>
                 )}
             </View>
         </View>
-        </SafeAreaView>
       
     );
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, padding: 16 },
+    container: { flex: 1, padding: 12 },
     tabRow: { flexDirection: "row", marginBottom: 12, gap: 8 },
     tab: {
         flex: 1,

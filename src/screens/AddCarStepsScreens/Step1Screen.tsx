@@ -31,6 +31,7 @@ export default function Step1Screen({ formData, setFormData }){
              <TextInput
         label="Year"
         mode="outlined"
+        keyboardType="numeric"
         outlineColor={Colors.primary} 
         activeOutlineColor={Colors.primary}
          value={formData.year}
@@ -50,7 +51,7 @@ export default function Step1Screen({ formData, setFormData }){
         mode="outlined"
         outlineColor={Colors.primary} 
         activeOutlineColor={Colors.primary}
-         value={formData.plate_nubmer}
+         value={formData.plate_number}
         onChangeText={((text) => 
         setFormData({ ...formData, plate_number: text}))}/>
             </View>
