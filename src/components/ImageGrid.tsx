@@ -1,10 +1,10 @@
-import React from "react";
-import { View, Image, FlatList, TouchableOpacity } from "react-native";
-import { IconButton } from "react-native-paper";
+import React from 'react'
+import { View, Image, FlatList, TouchableOpacity } from 'react-native'
+import { IconButton } from 'react-native-paper'
 export default function ImageGrid({ images, setImages }) {
   const removeImage = (index: number) => {
-    setImages(prev => prev.filter((_, i) => i !== index));
-  };
+    setImages((prev) => prev.filter((_, i) => i !== index))
+  }
 
   return (
     <FlatList
@@ -14,7 +14,7 @@ export default function ImageGrid({ images, setImages }) {
       contentContainerStyle={{ gap: 10 }}
       columnWrapperStyle={{ gap: 10 }}
       renderItem={({ item, index }) => (
-        <View style={{ position: "relative" }}>
+        <View style={{ position: 'relative' }}>
           <Image
             source={{ uri: item }}
             style={{
@@ -30,15 +30,15 @@ export default function ImageGrid({ images, setImages }) {
             size={18}
             iconColor="white"
             style={{
-              position: "absolute",
+              position: 'absolute',
               top: -8,
               right: -8,
-              backgroundColor: "rgba(0,0,0,0.6)",
+              backgroundColor: 'rgba(0,0,0,0.6)',
             }}
             onPress={() => removeImage(index)}
           />
         </View>
       )}
     />
-  );
+  )
 }

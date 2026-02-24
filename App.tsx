@@ -7,9 +7,9 @@ import ProfileScreen from './src/screens/ProfileScreen'
 import { NavigationContainer } from '@react-navigation/native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import Feather from '@expo/vector-icons/Feather';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
+import Ionicons from '@expo/vector-icons/Ionicons'
+import Feather from '@expo/vector-icons/Feather'
 
 import { useFonts } from 'expo-font'
 import DetailScreen from './src/screens/DetailScreen'
@@ -17,6 +17,7 @@ import ScheduleScreen from './src/screens/ScheduleScreen'
 import VehiclesScreen from './src/screens/VehiclesScreen'
 import VehicleFormScreen from './src/screens/VehicleFormScreen'
 import { PaperProvider, Provider } from 'react-native-paper'
+import AddCarSuccessScreen from './src/screens/AddCarStepsScreens/AddCarSuccessScreen'
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
 
@@ -29,59 +30,74 @@ export default function App() {
     })
   }, [])
 
-   const [fontsLoaded] = useFonts({
-  MyHeaderFontRegular: require('./assets/fonts/Montserrat-Regular.ttf'),
-  MyHeaderFontBold: require('./assets/fonts/Montserrat-SemiBold.ttf'),
-  MySubHeaderFontSemiBold: require('./assets/fonts/Inter-SemiBold.ttf'),
-  MyRegularFont: require('./assets/fonts/Roboto-Regular.ttf'),
-  MyRegularBodFont: require('./assets/fonts/Roboto-SemiBold.ttf')
-});
+  const [fontsLoaded] = useFonts({
+    MyHeaderFontRegular: require('./assets/fonts/Montserrat-Regular.ttf'),
+    MyHeaderFontBold: require('./assets/fonts/Montserrat-SemiBold.ttf'),
+    MySubHeaderFontSemiBold: require('./assets/fonts/Inter-SemiBold.ttf'),
+    MyRegularFont: require('./assets/fonts/Roboto-Regular.ttf'),
+    MyRegularBodFont: require('./assets/fonts/Roboto-SemiBold.ttf'),
+  })
 
-  if (!fontsLoaded) return null; 
+  if (!fontsLoaded) return null
 
   if (!user) return <LoginScreen onLogin={setUser} />
 
-
   const MyTabs = () => (
-  <Tab.Navigator screenOptions={{ headerShown: false, tabBarActiveTintColor: "#192f6a" }}>
-        <Tab.Screen name="Home" component={HomeScreen} options={{tabBarIcon: ({ color, size }) => (
-          <Feather name="home" size={size} color={color} />
-        ),
-        }}/>
-          <Tab.Screen name="Vehicles" component={VehiclesScreen} options={{tabBarIcon: ({ color, size }) => (
-          <Ionicons name="car-outline" size={size} color={color} />
-        ),
-        }}/>
-        <Tab.Screen
-          name="Profile"
-          children={() => (
-            <ProfileScreen
-              user={user}
-              onSignOut={async () => {
-                await supabase.auth.signOut()
-                setUser(null)
-              }}
+    <Tab.Navigator
+      screenOptions={{ headerShown: false, tabBarActiveTintColor: '#192f6a' }}
+    >
+      <Tab.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Feather name="home" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Vehicles"
+        component={VehiclesScreen}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="car-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Profile"
+        children={() => (
+          <ProfileScreen
+            user={user}
+            onSignOut={async () => {
+              await supabase.auth.signOut()
+              setUser(null)
+            }}
+          />
+        )}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons
+              name="account-circle-outline"
+              size={size}
+              color={color}
             />
-          )}
-          options={{ tabBarIcon: ({color, size}) => (
-            <MaterialCommunityIcons name="account-circle-outline" size={size} color={color} />
-          )}}
-        />
-       
-      </Tab.Navigator>
+          ),
+        }}
+      />
+    </Tab.Navigator>
   )
 
   return (
     <PaperProvider>
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{headerShown: false}}>
-        <Stack.Screen name="Tabs" component={MyTabs} />
-        <Stack.Screen name="Details" component={DetailScreen}/>
-        <Stack.Screen name="VehicleForm" component={VehicleFormScreen}/>
-      </Stack.Navigator>
-    </NavigationContainer>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Tabs" component={MyTabs} />
+          <Stack.Screen name="Details" component={DetailScreen} />
+          <Stack.Screen name="VehicleForm" component={VehicleFormScreen} />
+          <Stack.Screen name="AddCarSuccess" component={AddCarSuccessScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
     </PaperProvider>
-
   )
 }
-

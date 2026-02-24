@@ -1,66 +1,66 @@
-import { Text, View, ScrollView } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { ScrollView, Text, View } from 'react-native'
 import { TextInput } from 'react-native-paper'
 import { Colors } from '../../constants/colors'
-export default function Step3Screen({ formData, setFormData }) {
+export default function BasicCarInfoScreen({ formData, setFormData }) {
   return (
     <ScrollView style={{ gap: 10 }} showsVerticalScrollIndicator={false}>
       <View>
         <Text style={{ fontFamily: 'MyHeaderFontBold', fontSize: 20 }}>
-          Step 4: Location{' '}
+          {' '}
+          Step 1: Basic Information{' '}
         </Text>
         <Text style={{ fontFamily: 'MyHeaderFontRegular', fontSize: 16 }}>
-          Choose where renters can pick up the vehicle. This helps us show your
-          car to nearby users.
-        </Text>
-        <Text>
-          Optional extra tip: You can adjust the pin on the map for precise
-          location.
+          Enter the basic information exactly as it appears on the vehicle
+          registration.
         </Text>
       </View>
 
       <View style={{ gap: 20, marginTop: 20 }}>
         <TextInput
-          label="City"
+          label="Make"
           mode="outlined"
           outlineColor={Colors.primary}
           activeOutlineColor={Colors.primary}
-          value={formData.city}
-          onChangeText={(text) => setFormData({ ...formData, city: text })}
+          value={formData.make}
+          onChangeText={(text) => setFormData({ ...formData, make: text })}
         />
 
         <TextInput
-          label="Province"
+          label="Model"
           mode="outlined"
           outlineColor={Colors.primary}
           activeOutlineColor={Colors.primary}
-          value={formData.province}
-          onChangeText={(text) => setFormData({ ...formData, province: text })}
+          value={formData.model}
+          onChangeText={(text) => setFormData({ ...formData, model: text })}
         />
 
         <TextInput
-          label="Pickup"
+          label="Year"
+          mode="outlined"
+          keyboardType="numeric"
+          outlineColor={Colors.primary}
+          activeOutlineColor={Colors.primary}
+          value={formData.year}
+          onChangeText={(text) => setFormData({ ...formData, year: text })}
+        />
+        <TextInput
+          label="Color"
           mode="outlined"
           outlineColor={Colors.primary}
           activeOutlineColor={Colors.primary}
-          value={formData.pickup_location}
+          value={formData.color}
+          onChangeText={(text) => setFormData({ ...formData, color: text })}
+        />
+
+        <TextInput
+          label="Plate number"
+          mode="outlined"
+          outlineColor={Colors.primary}
+          activeOutlineColor={Colors.primary}
+          value={formData.plate_number}
           onChangeText={(text) =>
-            setFormData({ ...formData, pickup_location: text })
+            setFormData({ ...formData, plate_number: text })
           }
-        />
-
-        <TextInput
-          label="Latitude"
-          mode="outlined"
-          outlineColor={Colors.primary}
-          activeOutlineColor={Colors.primary}
-        />
-
-        <TextInput
-          label="Longitude"
-          mode="outlined"
-          outlineColor={Colors.primary}
-          activeOutlineColor={Colors.primary}
         />
       </View>
     </ScrollView>

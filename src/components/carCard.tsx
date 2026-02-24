@@ -1,15 +1,18 @@
-import { View, Text, Image, StyleSheet } from "react-native";
-import { Colors } from "../constants/colors";
+import { View, Text, Image, StyleSheet } from 'react-native'
+import { Colors } from '../constants/colors'
+import { getPublicUrl } from '../services/api'
 export default function CarCard({ car }) {
   const thumbnail =
-    car.car_images?.find(img => img.is_thumbnail)?.image_url ||
-    car.car_images?.[0]?.image_url;
+    car.car_images?.find((img) => img.is_thumbnail)?.image_url ||
+    car.car_images?.[0]?.image_url
 
+  const imageUrl = getPublicUrl(thumbnail)
+  console.log(imageUrl)
   return (
     <View style={styles.carCard} id={car.id}>
       {/* Car Image */}
       <Image
-        source={{ uri: thumbnail }}
+        source={{ uri: imageUrl }}
         style={styles.carImage}
         resizeMode="contain"
       />
@@ -28,17 +31,17 @@ export default function CarCard({ car }) {
         </Text>
       </View>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
   carCard: {
-    backgroundColor: "#fff",
-    flexDirection: "row",
+    backgroundColor: '#fff',
+    flexDirection: 'row',
     borderRadius: 12,
     padding: 15,
     marginVertical: 8,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 3 },
     shadowRadius: 5,
@@ -52,13 +55,13 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     flex: 1,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
   },
   carTitle: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 4,
-    fontFamily: 'MyHeaderFontBold'
+    fontFamily: 'MyHeaderFontBold',
   },
   carDetails: {
     fontSize: 12,
@@ -67,7 +70,7 @@ const styles = StyleSheet.create({
   },
   carPrice: {
     fontSize: 14,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     color: Colors.primary,
   },
-});
+})

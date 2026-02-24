@@ -233,7 +233,7 @@ export async function uploadCarImage(imageUri){
 
    const fileName = `${Date.now()}.jpeg`
   const filePath = `${user.id}/${fileName}`
-
+  
   const { data, error } = await supabase.storage
     .from('car_images')
     .upload(filePath, arrayBuffer, {
@@ -248,3 +248,40 @@ export async function uploadCarImage(imageUri){
 
   return data;
 };
+export async function addCarImage(newImage : {
+  car_id: string;
+  image_url: string;
+  
+}){
+  try{
+    
+  const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
+
+    if (authError || !user) {
+      console.error('No authenticated user')
+      return
+    }
+
+    const { data, error } = await supabase.from('car_images').insert([newImage]);
+
+    if (error){
+       console.error("Error adding car image ", error.message);
+        return null;
+    }
+
+    return data;
+  }catch (error){
+    console.log("Failed to add car image : ", error)
+  }
+} 
+
+export function getPublicUrl(path) {
+  const { data } = supabase.storage
+    .from('car_images')
+    .getPublicUrl(path)
+
+  return data.publicUrl
+}
