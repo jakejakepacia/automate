@@ -1,4 +1,4 @@
-import { View, Text, Image, StyleSheet } from 'react-native'
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
 import { Colors } from '../constants/colors'
 import { getPublicUrl } from '../services/api'
 export default function CarCard({ car }) {
@@ -7,7 +7,7 @@ export default function CarCard({ car }) {
     car.car_images?.[0]?.image_url
 
   const imageUrl = getPublicUrl(thumbnail)
-  console.log(imageUrl)
+  const pricePerDay = car.car_pricing?.[0]?.per_per_day
   return (
     <View style={styles.carCard} id={car.id}>
       {/* Car Image */}
@@ -26,9 +26,19 @@ export default function CarCard({ car }) {
           {car.year} • {car.color} • {car.city}
         </Text>
 
-        <Text style={styles.carPrice}>
-          ₱{car.car_pricing?.[0]?.price_per_day} / day
-        </Text>
+        {pricePerDay == null && (
+          <TouchableOpacity style={styles.button}>
+            <Text style={{ color: 'white', fontFamily: 'MyRegularFont' }}>
+              Create Rental Listing
+            </Text>
+          </TouchableOpacity>
+        )}
+
+        {pricePerDay != null && (
+          <Text style={styles.carPrice}>
+            ₱{car.car_pricing?.[0]?.price_per_day} / day
+          </Text>
+        )}
       </View>
     </View>
   )
@@ -72,5 +82,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     color: Colors.primary,
+  },
+  button: {
+    backgroundColor: Colors.primary,
+    borderRadius: 5,
+    alignContent: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 24,
   },
 })

@@ -20,7 +20,6 @@ import BasicCarInfoScreen from './AddCarStepsScreens/BasicCarInfoScreen'
 import CarSpecsScreen from './AddCarStepsScreens/CarSpecsScreen'
 import Step3Screen from './AddCarStepsScreens/Step3Screen'
 import UploadCarImages from './AddCarStepsScreens/UploadCarImages'
-import CarPricingScreen from './AddCarStepsScreens/CarPricingScreen'
 
 const screenWidth = Dimensions.get('window').width
 
@@ -175,8 +174,11 @@ export default function VehicleFormScreen({ navigation }) {
     const result = await addCar(formData)
 
     if (result) {
-      uploadAllImages(result[0].id)
-      navigation.navigate('AddCarSuccess')
+      const car_id = result[0].id
+      uploadAllImages(car_id)
+      navigation.navigate('AddCarSuccess', {
+        car_id: car_id,
+      })
     }
 
     setIsLoading(false)
@@ -201,12 +203,6 @@ export default function VehicleFormScreen({ navigation }) {
         )}
         {step === 3 && (
           <UploadCarImages images={carImages} setImages={setCarImages} />
-        )}
-        {step === 4 && (
-          <Step3Screen formData={formData} setFormData={setFormData} />
-        )}
-        {step === 5 && (
-          <CarPricingScreen formData={formData} setFormData={setFormData} />
         )}
       </View>
 
@@ -261,6 +257,7 @@ export default function VehicleFormScreen({ navigation }) {
               alignItems: 'center',
               justifyContent: 'center',
             }}
+            disabled={isLoading}
           >
             {isLoading ? (
               <ActivityIndicator color={'white'} />

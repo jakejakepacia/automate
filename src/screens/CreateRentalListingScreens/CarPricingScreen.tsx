@@ -5,12 +5,18 @@ import { MaterialIcons } from '@expo/vector-icons'
 import { TextInput } from 'react-native-paper'
 import { Colors } from '../../constants/colors'
 export default function CarPricingScreen({ formData, setFormData }) {
-  const [checked, setChecked] = useState(false)
+  const [checked, setChecked] = useState(formData.with_driver)
+
+  const setRentWithDriver = () => {
+    setChecked(!checked)
+    setFormData({ ...formData, with_driver: !checked })
+  }
+
   return (
     <ScrollView style={{ gap: 20 }} showsVerticalScrollIndicator={false}>
       <View>
         <Text style={{ fontFamily: 'MyHeaderFontBold', fontSize: 20 }}>
-          Step 5: Rental Pricing{' '}
+          Step 1: Rental Pricing{' '}
         </Text>
         <Text style={{ fontFamily: 'MyHeaderFontRegular', fontSize: 16 }}>
           Enter car pricing per day, week and month.
@@ -22,8 +28,8 @@ export default function CarPricingScreen({ formData, setFormData }) {
           mode="outlined"
           outlineColor={Colors.primary}
           activeOutlineColor={Colors.primary}
-          value={formData.city}
-          onChangeText={(text) => setFormData({ ...formData, city: text })}
+          value={formData.daily}
+          onChangeText={(text) => setFormData({ ...formData, daily: text })}
         />
 
         <TextInput
@@ -31,8 +37,8 @@ export default function CarPricingScreen({ formData, setFormData }) {
           mode="outlined"
           outlineColor={Colors.primary}
           activeOutlineColor={Colors.primary}
-          value={formData.province}
-          onChangeText={(text) => setFormData({ ...formData, province: text })}
+          value={formData.weekly}
+          onChangeText={(text) => setFormData({ ...formData, weekly: text })}
         />
 
         <TextInput
@@ -40,17 +46,12 @@ export default function CarPricingScreen({ formData, setFormData }) {
           mode="outlined"
           outlineColor={Colors.primary}
           activeOutlineColor={Colors.primary}
-          value={formData.pickup_location}
-          onChangeText={(text) =>
-            setFormData({ ...formData, pickup_location: text })
-          }
+          value={formData.monthly}
+          onChangeText={(text) => setFormData({ ...formData, monthly: text })}
         />
 
         <View style={styles.container}></View>
-        <Pressable
-          style={styles.container}
-          onPress={() => setChecked(!checked)}
-        >
+        <Pressable style={styles.container} onPress={setRentWithDriver}>
           {checked ? (
             <MaterialIcons name="check-box" size={34} color="#007AFF" />
           ) : (
@@ -69,9 +70,9 @@ export default function CarPricingScreen({ formData, setFormData }) {
             mode="outlined"
             outlineColor={Colors.primary}
             activeOutlineColor={Colors.primary}
-            value={formData.pickup_location}
+            value={formData.driver_price_per_day}
             onChangeText={(text) =>
-              setFormData({ ...formData, pickup_location: text })
+              setFormData({ ...formData, driver_price_per_day: text })
             }
           />
         )}

@@ -244,6 +244,27 @@ export default function DetailScreen({ route, navigation }) {
             </Modal>
           </View>
         )}
+
+        {fromOwnedCars && (
+          <View style={{ gap: 10, marginTop: 20 }}>
+            <TouchableOpacity
+              style={styles.forRentButton}
+              onPress={() =>
+                navigation.navigate('CreateRentalListing', {
+                  car_id: selectedCar.id,
+                })
+              }
+            >
+              <Text style={styles.step}>Create Rental Listing</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.goHomeBtn}>
+              <Text style={[styles.step, { color: Colors.primary }]}>
+                Edit Car Details
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   )
@@ -318,5 +339,28 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+  },
+  forRentButton: {
+    backgroundColor: Colors.primary,
+    borderRadius: 10,
+    alignContent: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 50,
+  },
+  goHomeBtn: {
+    borderColor: Colors.primary,
+    borderWidth: 1,
+    borderRadius: 10,
+    alignContent: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 50,
+  },
+  step: {
+    fontSize: 14,
+    lineHeight: 22,
+    color: 'white',
+    fontFamily: 'MyRegularFont',
   },
 })
