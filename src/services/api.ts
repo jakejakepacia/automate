@@ -335,3 +335,64 @@ export async function fetchCarDetailsById(car_id) {
     console.log('fetch car details error', error)
   }
 }
+export async function updateCarDetails(
+  carId: string,
+  location: {
+    city: string
+    province: string
+    pickup_location: string
+    latitude: string
+    longitude: string
+  }
+) {
+  const { data, error } = await supabase
+    .from('cars')
+    .update({
+      city: location.city,
+      province: location.province,
+      pickup_location: location.pickup_location,
+      latitude: location.latitude,
+      longitude: location.longitude,
+    })
+    .eq('id', carId)
+    .select()
+    .single() // ensures one row
+
+  if (error) {
+    console.log('Update error:', error.message)
+    throw error
+  }
+
+  return data
+}
+export async function addCarPricing(car_price:{
+  price_per_day: number,
+  price_per_week: number,
+  price_per_month: number,
+  with_driver: boolean,
+  with_driver_price_per_day: number
+}) {
+
+   try {
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
+
+    if (authError || !user) {
+      console.error('No authenticated user')
+      return
+    }
+
+    const { data, error } = await supabase.from('car_pricing').insert([car_price])
+
+    if (error) {
+      console.error('Error adding car pricing ', error.message)
+      return null
+    }
+
+    return data
+  } catch (error) {
+    console.log('Failed to add car pricing : ', error)
+  }
+}

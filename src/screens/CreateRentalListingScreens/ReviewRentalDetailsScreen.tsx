@@ -42,6 +42,7 @@ export default function ReviewRentalDetailsScreen({
     car.car_images?.[0]?.image_url
 
   const imageUrl = getPublicUrl(thumbnail)
+
   return (
     <ScrollView>
       <View style={styles.container}>

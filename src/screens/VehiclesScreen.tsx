@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { Suspense, useEffect, useState } from 'react'
 import {
   View,
   Text,
@@ -59,6 +59,7 @@ export default function VehiclesScreen({ navigation }) {
       setError(null)
       const result = await fetchOwnedCars()
       setCars(result)
+      setLoading(false)
     } catch (error) {
       console.error('error fetching owned cars: ', error)
     }
@@ -77,7 +78,9 @@ export default function VehiclesScreen({ navigation }) {
           navigation.navigate('Details', { car: item, fromOwnedCars: true })
         }
       >
-        <CarCard car={item} />
+        <Suspense fallback={<ActivityIndicator />}>
+          <CarCard car={item} />
+        </Suspense>
       </TouchableOpacity>
     )
   }
@@ -160,13 +163,18 @@ export default function VehiclesScreen({ navigation }) {
           )
         ) : (
           <View style={{ gap: 5, flex: 1 }}>
-            <FlatList
-              data={cars}
-              keyExtractor={(i) => i.id}
-              renderItem={renderOwneCars}
-              showsVerticalScrollIndicator={false}
-              style={{ padding: 2 }}
-            />
+            {loading ? (
+              <ActivityIndicator />
+            ) : (
+              <FlatList
+                data={cars}
+                keyExtractor={(i) => i.id}
+                renderItem={renderOwneCars}
+                showsVerticalScrollIndicator={false}
+                style={{ padding: 2 }}
+              />
+            )}
+
             <TouchableOpacity
               style={styles.addButton}
               onPress={() => navigation.navigate('VehicleForm')}

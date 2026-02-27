@@ -8,6 +8,7 @@ import {
   Animated,
   TouchableOpacity,
   Dimensions,
+  Alert,
 } from 'react-native'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useRoute } from '@react-navigation/native'
@@ -19,6 +20,7 @@ import CarPricingScreen from './CarPricingScreen'
 import { Button } from 'react-native-paper'
 import PickupLocationScreen from './PickupLocationScreen'
 import ReviewRentalDetailsScreen from './ReviewRentalDetailsScreen'
+import { updateCarDetails, addCarPricing } from '../../services/api'
 const screenWidth = Dimensions.get('window').width
 export default function CreateRentalListingScreen({ navigation }) {
   const route = useRoute()
@@ -58,18 +60,68 @@ export default function CreateRentalListingScreen({ navigation }) {
     outputRange: [0, screenWidth - 72 - 70], // padding + approx text width
   })
 
-  const updateCarPickupLocation = () => {}
+  const updateCarPickupLocation = async () => {
+    try {
+      setIsLoading(true)
 
-  const addCarRentalPricing = () => {}
+      const updatedCar = await updateCarDetails(car_id, {
+        city: formData.city,
+        province: formData.province,
+        pickup_location: formData.pickup_location,
+        latitude: formData.latitude,
+        longitude: formData.longitude,
+      })
 
-  const handleNextButton = () => {
+      console.log('Updated:', updatedCar)
+      Alert.alert('Success', 'Car updated successfully')
+    } catch (error: any) {
+      Alert.alert('Error', error.message)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const addCarRentalPricing = async () => {
+    try {
+      setIsLoading(true)
+
+      const car_price = {
+        price_per_day: formData.daily,
+        price_per_week: formData.weekly,
+        price_per_month: formData.monthly,
+        with_driver: formData.with_driver,
+        with_driver_price_per_day: formData.driver_price_per_day,
+        car_id: car_id,
+      }
+      const updatedCar = await addCarPricing(car_price)
+
+      console.log('Updated:', updatedCar)
+      Alert.alert('Success', 'Car updated successfully')
+    } catch (error: any) {
+      Alert.alert('Error', error.message)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleNextButton = async () => {
     if (step < totalSteps) {
       setStep(step + 1)
     }
 
     console.log(step)
     if (step === totalSteps) {
-      setIsLoading(true)
+      try {
+        setIsLoading(true)
+
+        await Promise.all([updateCarPickupLocation(), addCarRentalPricing()])
+
+        navigation.navigate('RentalListingSuccessScreen')
+      } catch (error) {
+        console.log('Error submitting:', error)
+      } finally {
+        setIsLoading(false)
+      }
     }
   }
 

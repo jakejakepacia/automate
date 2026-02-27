@@ -19,6 +19,7 @@ import VehicleFormScreen from './src/screens/VehicleFormScreen'
 import { PaperProvider, Provider } from 'react-native-paper'
 import AddCarSuccessScreen from './src/screens/AddCarStepsScreens/AddCarSuccessScreen'
 import CreateRentalListingScreen from './src/screens/CreateRentalListingScreens/CreateRentalListingScreen'
+import RentalListingSuccessScreen from './src/screens/CreateRentalListingScreens/RentalListingSuccessScreen'
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
 
@@ -106,6 +107,13 @@ export default function App() {
           <Stack.Screen
             name="CreateRentalListing"
             component={CreateRentalListingScreen}
+          />
+          <Stack.Screen
+            name="RentalListingSuccessScreen"
+            component={RentalListingSuccessScreen}
+            options={{
+              gestureEnabled: false,
+            }}
           />
         </Stack.Navigator>
       </NavigationContainer>
