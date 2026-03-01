@@ -94,7 +94,7 @@ export default function HomeScreen({ navigation }) {
   }
 
   return (
-    <ScrollView>
+    <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
       <LinearGradient
         colors={['#4c669f', '#3b5998', '#192f6a']} // gradient colors
         style={styles.container}

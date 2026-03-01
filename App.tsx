@@ -20,6 +20,8 @@ import { PaperProvider, Provider } from 'react-native-paper'
 import AddCarSuccessScreen from './src/screens/AddCarStepsScreens/AddCarSuccessScreen'
 import CreateRentalListingScreen from './src/screens/CreateRentalListingScreens/CreateRentalListingScreen'
 import RentalListingSuccessScreen from './src/screens/CreateRentalListingScreens/RentalListingSuccessScreen'
+import RentingScreen from './src/screens/RentingScreen'
+import MessageScreen from './src/screens/MessageScreen'
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
 
@@ -46,44 +48,66 @@ export default function App() {
 
   const MyTabs = () => (
     <Tab.Navigator
-      screenOptions={{ headerShown: false, tabBarActiveTintColor: '#192f6a' }}
+      screenOptions={{
+        headerShown: false,
+        tabBarShowLabel: true,
+        tabBarActiveTintColor: '#192f6a',
+        tabBarInactiveTintColor: '#9CA3AF',
+        tabBarStyle: {
+          position: 'absolute',
+          bottom: 30,
+          left: 16,
+          right: 16,
+          backgroundColor: '#FFFFFF',
+          borderRadius: 22,
+          height: 65,
+          borderTopWidth: 0,
+          marginInline: 20,
+
+          elevation: 8,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.08,
+          shadowRadius: 12,
+        },
+      }}
     >
       <Tab.Screen
-        name="Home"
+        name="Explore"
         component={HomeScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <Feather name="home" size={size} color={color} />
+            <Feather name="search" size={size} color={color} />
           ),
         }}
       />
+
+      <Tab.Screen
+        name="Renting"
+        component={RentingScreen}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="calendar-outline" size={size} color={color} />
+          ),
+        }}
+      />
+
       <Tab.Screen
         name="Vehicles"
         component={VehiclesScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="car-outline" size={size} color={color} />
+            <Ionicons name="car-sport-outline" size={size} color={color} />
           ),
         }}
       />
+
       <Tab.Screen
-        name="Profile"
-        children={() => (
-          <ProfileScreen
-            user={user}
-            onSignOut={async () => {
-              await supabase.auth.signOut()
-              setUser(null)
-            }}
-          />
-        )}
+        name="Inbox"
+        component={MessageScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons
-              name="account-circle-outline"
-              size={size}
-              color={color}
-            />
+            <Feather name="message-circle" size={size} color={color} />
           ),
         }}
       />

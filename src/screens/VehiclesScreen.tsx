@@ -193,7 +193,7 @@ export default function VehiclesScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 12 },
+  container: { flex: 1, padding: 12, paddingBottom: 110 },
   tabRow: { flexDirection: 'row', marginBottom: 12, gap: 8 },
   tab: {
     flex: 1,
