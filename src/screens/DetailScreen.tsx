@@ -17,6 +17,7 @@ import ScheduleScreen from './ScheduleScreen'
 import { fetchBookings } from '../services/api'
 import { formatPHP } from '../constants/formatPHP'
 import { getPublicUrl } from '../services/api'
+import { startOrSendMessage } from '../services/message'
 
 const { width: windowWidth, height: windowHeight } = Dimensions.get('window')
 
@@ -89,6 +90,24 @@ export default function DetailScreen({ route, navigation }) {
     } else {
       setModalVisible(true)
     }
+  }
+
+  const sendMessage = async () => {
+    // owner id comes from the joined user record on the car
+    const ownerId = car.users?.id
+    if (!ownerId) return
+
+    // start conversation or reuse existing
+    const conversationId = await startOrSendMessage(ownerId, '')
+    // navigate into the conversation screen immediately
+    navigation.navigate('Conversation', {
+      conversationId,
+      otherUser: {
+        id: ownerId,
+        name: car.users?.name,
+        profile_image: car.users?.profile_image,
+      },
+    })
   }
   return (
     <SafeAreaView style={styles.container}>
@@ -165,7 +184,7 @@ export default function DetailScreen({ route, navigation }) {
                   {car.users?.city || car.city}
                 </Text>
               </View>
-              <TouchableOpacity style={styles.button}>
+              <TouchableOpacity style={styles.button} onPress={sendMessage}>
                 <Text style={{ color: 'white' }}>Message</Text>
               </TouchableOpacity>
             </View>
