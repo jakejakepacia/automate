@@ -17,7 +17,9 @@ import CarCard from '../components/carCard'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { Colors } from '../constants/colors'
 export default function VehiclesScreen({ navigation }) {
-  const [tab, setTab] = useState<'renting' | 'owned'>('renting')
+  const [tab, setTab] = useState<'active' | 'owned' | 'pending' | 'rented'>(
+    'active',
+  )
   const [bookings, setBookings] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -30,7 +32,7 @@ export default function VehiclesScreen({ navigation }) {
   const fromAddCarPage = route.params?.fromAddCarPage
 
   useEffect(() => {
-    if (tab === 'renting') loadRenting()
+    if (tab === 'active') loadRenting()
   }, [tab])
 
   useEffect(() => {
@@ -85,56 +87,9 @@ export default function VehiclesScreen({ navigation }) {
     )
   }
 
-  function renderBooking({ item }: { item: any }) {
-    const car = item.cars || null
-    const thumbnail = car?.car_images?.find(
-      (img: any) => img.is_thumbnail,
-    )?.image_url
-
-    return (
-      <TouchableOpacity
-        onPress={() => navigation.navigate('Details', { car: car })}
-      >
-        <View style={styles.card}>
-          {thumbnail ? (
-            <Image source={{ uri: thumbnail }} style={styles.thumb} />
-          ) : (
-            <View style={styles.thumbPlaceholder} />
-          )}
-          <View style={styles.info}>
-            <Text style={styles.title} numberOfLines={1}>
-              {car
-                ? `${car.make} ${car.model} ${car.year || ''}`
-                : `Car ID: ${item.car_id}`}
-            </Text>
-            <Text style={styles.meta}>
-              {`From: ${item.start_date || '-'} • To: ${item.end_date || '-'}`}
-            </Text>
-            <Text
-              style={styles.meta}
-            >{`Status: ${item.status || 'pending'}`}</Text>
-            {item.total_price != null ? (
-              <Text style={styles.price}>{`$${item.total_price}`}</Text>
-            ) : null}
-          </View>
-        </View>
-      </TouchableOpacity>
-    )
-  }
-
   return (
     <View style={[styles.container, { marginTop: insents.top }]}>
       <View style={styles.tabRow}>
-        <TouchableOpacity
-          style={[styles.tab, tab === 'renting' ? styles.tabActive : null]}
-          onPress={() => setTab('renting')}
-        >
-          <Text
-            style={tab === 'renting' ? styles.tabTextActive : styles.tabText}
-          >
-            Renting
-          </Text>
-        </TouchableOpacity>
         <TouchableOpacity
           style={[styles.tab, tab === 'owned' ? styles.tabActive : null]}
           onPress={handleOwnedCarPress}
@@ -143,50 +98,63 @@ export default function VehiclesScreen({ navigation }) {
             Owned
           </Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, tab === 'active' ? styles.tabActive : null]}
+          onPress={() => setTab('active')}
+        >
+          <Text
+            style={tab === 'active' ? styles.tabTextActive : styles.tabText}
+          >
+            Active
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, tab === 'pending' ? styles.tabActive : null]}
+          onPress={() => setTab('pending')}
+        >
+          <Text
+            style={tab === 'pending' ? styles.tabTextActive : styles.tabText}
+          >
+            Pending
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, tab === 'rented' ? styles.tabActive : null]}
+          onPress={() => setTab('rented')}
+        >
+          <Text
+            style={tab === 'rented' ? styles.tabTextActive : styles.tabText}
+          >
+            Rented
+          </Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.content}>
-        {tab === 'renting' ? (
-          loading ? (
+        <View style={{ gap: 5, flex: 1 }}>
+          {loading ? (
             <ActivityIndicator />
-          ) : error ? (
-            <Text style={styles.error}>{error}</Text>
-          ) : bookings.length === 0 ? (
-            <Text style={styles.empty}>No bookings found</Text>
           ) : (
             <FlatList
-              data={bookings}
+              data={cars}
               keyExtractor={(i) => i.id}
-              renderItem={renderBooking}
+              renderItem={renderOwneCars}
+              showsVerticalScrollIndicator={false}
               style={{ padding: 2 }}
             />
-          )
-        ) : (
-          <View style={{ gap: 5, flex: 1 }}>
-            {loading ? (
-              <ActivityIndicator />
-            ) : (
-              <FlatList
-                data={cars}
-                keyExtractor={(i) => i.id}
-                renderItem={renderOwneCars}
-                showsVerticalScrollIndicator={false}
-                style={{ padding: 2 }}
-              />
-            )}
+          )}
 
-            <TouchableOpacity
-              style={styles.addButton}
-              onPress={() => navigation.navigate('VehicleForm')}
-            >
-              <Ionicons
-                name="add-circle-sharp"
-                size={80}
-                color={Colors.primary}
-              />
-            </TouchableOpacity>
-          </View>
-        )}
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => navigation.navigate('VehicleForm')}
+          >
+            <Ionicons
+              name="add-circle-sharp"
+              size={80}
+              color={Colors.primary}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   )

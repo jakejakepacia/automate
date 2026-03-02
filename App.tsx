@@ -111,6 +111,27 @@ export default function App() {
           ),
         }}
       />
+      <Tab.Screen
+        name="Profile"
+        children={() => (
+          <ProfileScreen
+            user={user}
+            onSignOut={async () => {
+              await supabase.auth.signOut()
+              setUser(null)
+            }}
+          />
+        )}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons
+              name="account-circle-outline"
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
     </Tab.Navigator>
   )
 

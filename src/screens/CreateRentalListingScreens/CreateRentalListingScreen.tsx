@@ -71,9 +71,6 @@ export default function CreateRentalListingScreen({ navigation }) {
         latitude: formData.latitude,
         longitude: formData.longitude,
       })
-
-      console.log('Updated:', updatedCar)
-      Alert.alert('Success', 'Car updated successfully')
     } catch (error: any) {
       Alert.alert('Error', error.message)
     } finally {

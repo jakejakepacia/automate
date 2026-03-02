@@ -129,6 +129,126 @@ export async function fetchBookings() {
     console.error('Failed fetching boookings:')
   }
 }
+export async function fetchPendingBookings() {
+  try {
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
+
+    if (authError || !user) {
+      console.error('No authenticated user')
+      return
+    }
+
+    const { data, error } = await supabase
+      .from('bookings')
+      .select(
+        `*, 
+                      cars(id, make, model, year, city, fuel_type, transmission, seats, car_images(image_url, is_thumbnail),
+                      car_pricing (
+                        price_per_day,
+                        price_per_week,
+                        price_per_month),
+                      users!owner_id(name, id))`,
+      )
+      .eq('renter_id', user.id)
+      .order('start_date', { ascending: false })
+      .eq('status', 'pending')
+
+    if (error) {
+      console.error('Error fetching pending booking:', error.message)
+    } else {
+      return data
+    }
+  } catch {
+    console.error('Failed fetching pending boookings:')
+  }
+}
+export async function fetchUpcomingBookings() {
+  try {
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
+
+    if (authError || !user) {
+      console.error('No authenticated user')
+      return
+    }
+
+    const today = new Date()
+    today.setHours(0, 0, 0, 0) 
+
+    const tomorrow = new Date(today)
+    tomorrow.setDate(tomorrow.getDate() + 1)
+
+    const { data, error } = await supabase
+      .from('bookings')
+      .select(
+        `*, 
+                      cars(id, make, model, year, city, fuel_type, transmission, seats, car_images(image_url, is_thumbnail),
+                      car_pricing (
+                        price_per_day,
+                        price_per_week,
+                        price_per_month),
+                      users!owner_id(name, id))`,
+      )
+      .eq('renter_id', user.id)
+      .eq('status', 'approved')
+      .or(
+        `start_date.lt.${today.toISOString()},start_date.gte.${tomorrow.toISOString()}`
+    )
+
+
+    if (error) {
+      console.error('Error fetching upcoming booking:', error.message)
+    } else {
+      return data
+    }
+  } catch (error){
+    console.error('Failed fetching upcoming boookings:', error)
+  }
+}
+export async function fetchActiveBookings() {
+  try {
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
+
+    if (authError || !user) {
+      console.error('No authenticated user')
+      return
+    }
+
+    const now = new Date().toISOString()
+    const { data, error } = await supabase
+      .from('bookings')
+      .select(
+        `*, 
+                      cars(id, make, model, year, city, fuel_type, transmission, seats, car_images(image_url, is_thumbnail),
+                      car_pricing (
+                        price_per_day,
+                        price_per_week,
+                        price_per_month),
+                      users!owner_id(name, id))`,
+      )
+      .eq('renter_id', user.id)
+       .eq('status', 'approved')
+  .lte('start_date', now)
+  .gte('end_date', now)
+
+
+    if (error) {
+      console.error('Error fetching upcoming booking:', error.message)
+    } else {
+      return data
+    }
+  } catch (error){
+    console.error('Failed fetching upcoming boookings:', error)
+  }
+}
 export async function fetchOwnedCars() {
   try {
     const {

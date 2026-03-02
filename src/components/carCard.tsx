@@ -1,6 +1,7 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
 import { Colors } from '../constants/colors'
 import { getPublicUrl } from '../services/api'
+import { Chip } from 'react-native-paper'
 export default function CarCard({ car }) {
   const thumbnail =
     car.car_images?.find((img) => img.is_thumbnail)?.image_url ||
@@ -26,14 +27,11 @@ export default function CarCard({ car }) {
           {car.year} • {car.color} • {car.city}
         </Text>
 
-        {pricePerDay == null && (
-          <TouchableOpacity style={styles.button}>
-            <Text style={{ color: 'white', fontFamily: 'MyRegularFont' }}>
-              Create Rental Listing
-            </Text>
-          </TouchableOpacity>
-        )}
-
+        <View style={styles.chipRow}>
+          <Chip icon="fuel">{car.fuel_type}</Chip>
+          <Chip icon="car-shift-pattern">{car.transmission}</Chip>
+          <Chip icon="seat">{car.seats}</Chip>
+        </View>
         {pricePerDay != null && (
           <Text style={styles.carPrice}>
             ₱{car.car_pricing?.[0]?.price_per_day} / day
@@ -90,5 +88,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     height: 24,
+  },
+  chipRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 5,
   },
 })
