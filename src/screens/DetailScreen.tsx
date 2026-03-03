@@ -14,7 +14,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 import { Colors } from '../constants/colors'
 import Modal from 'react-native-modal'
 import ScheduleScreen from './ScheduleScreen'
-import { fetchBookings } from '../services/api'
+import { checkIfCarOwned, fetchBookings } from '../services/api'
 import { formatPHP } from '../constants/formatPHP'
 import { getPublicUrl } from '../services/api'
 import { startOrSendMessage } from '../services/message'
@@ -34,13 +34,24 @@ export default function DetailScreen({ route, navigation }) {
   const thumbnail =
     car.car_images?.find((img) => img.is_thumbnail)?.image_url ||
     car.car_images?.[0]?.image_url
-
+  const [isCarOwned, setIsCarOwned] = useState(false)
   const imageUrl = getPublicUrl(thumbnail)
 
   const price = car.car_pricing?.[0]?.price_per_day
 
   useEffect(() => {
     loadBookings()
+    console.log('car detttails, ', car)
+  }, [])
+
+  useEffect(() => {
+    const checkCar = async () => {
+      const result = await checkIfCarOwned(car.id)
+      console.log('ngek, ', result)
+      setIsCarOwned(result)
+    }
+
+    checkCar()
   }, [])
 
   const handleCloseModal = () => {
@@ -95,10 +106,12 @@ export default function DetailScreen({ route, navigation }) {
   const sendMessage = async () => {
     // owner id comes from the joined user record on the car
     const ownerId = car.users?.id
+    const carId = car.id
+    console.log('Car: ', car)
     if (!ownerId) return
 
     // start conversation or reuse existing
-    const conversationId = await startOrSendMessage(ownerId, '')
+    const conversationId = await startOrSendMessage(ownerId, '', car.id)
     // navigate into the conversation screen immediately
     navigation.navigate('Conversation', {
       conversationId,
@@ -107,6 +120,7 @@ export default function DetailScreen({ route, navigation }) {
         name: car.users?.name,
         profile_image: car.users?.profile_image,
       },
+      car,
     })
   }
   return (
@@ -184,9 +198,11 @@ export default function DetailScreen({ route, navigation }) {
                   {car.users?.city || car.city}
                 </Text>
               </View>
-              <TouchableOpacity style={styles.button} onPress={sendMessage}>
-                <Text style={{ color: 'white' }}>Message</Text>
-              </TouchableOpacity>
+              {!isCarOwned && (
+                <TouchableOpacity style={styles.button} onPress={sendMessage}>
+                  <Text style={{ color: 'white' }}>Message</Text>
+                </TouchableOpacity>
+              )}
             </View>
           </View>
         )}

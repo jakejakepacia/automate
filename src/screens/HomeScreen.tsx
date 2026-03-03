@@ -81,6 +81,7 @@ export default function HomeScreen({ navigation }) {
       setRefreshing(true)
       const data = await fetchCars()
       setCars(data)
+      console.log(cars)
     } catch (error) {
       console.error('Error fetching cars:', error)
     } finally {
@@ -188,7 +189,11 @@ export default function HomeScreen({ navigation }) {
           {cars.map((item) => (
             <TouchableOpacity
               key={item.id}
-              onPress={() => navigation.navigate('Details', { car: item })}
+              onPress={() =>
+                navigation.navigate('Details', {
+                  car: item,
+                })
+              }
             >
               <Suspense fallback={<ActivityIndicator />}>
                 <CarCard car={item} />

@@ -11,19 +11,22 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { fetchMessages, sendMessage } from '../services/message'
 import { supabase } from '../../lib/supabase'
+import NavigationBar from '../components/NavigationBar'
+import { fetchCarDetailsById } from '../services/api'
+import CarCard from '../components/carCard'
 
 export default function ConversationScreen({ route, navigation }) {
-  const { conversationId, otherUser } = route.params
+  const { conversationId, otherUser, car } = route.params
   const [messages, setMessages] = useState<any[]>([])
   const [text, setText] = useState('')
   const [myId, setMyId] = useState<string | null>(null)
   const flatListRef = useRef<any>(null)
-
+  const [carDetails, setCarDetails] = useState()
   useEffect(() => {
     navigation.setOptions({ title: otherUser?.name || 'Conversation' })
     getCurrentUser()
     loadMessages()
-
+    loadCar()
     // subscribe to realtime updates so the list refreshes automatically
     const channel = supabase
       .channel(`conversation-${conversationId}`)
@@ -58,6 +61,12 @@ export default function ConversationScreen({ route, navigation }) {
     setTimeout(() => {
       flatListRef.current?.scrollToEnd({ animated: true })
     }, 200)
+  }
+
+  const loadCar = async () => {
+    const result = await fetchCarDetailsById(car.car_id)
+    setCarDetails(result)
+    console.log('car details: ', carDetails)
   }
 
   const handleSend = async () => {
@@ -99,6 +108,7 @@ export default function ConversationScreen({ route, navigation }) {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={20}
       >
+        <NavigationBar title={otherUser?.name} navigation={navigation} />
         <FlatList
           ref={flatListRef}
           data={messages}
@@ -109,6 +119,12 @@ export default function ConversationScreen({ route, navigation }) {
             flatListRef.current?.scrollToEnd({ animated: true })
           }
         />
+
+        {carDetails != undefined && (
+          <View style={{ paddingInline: 20 }}>
+            <CarCard car={carDetails} />
+          </View>
+        )}
 
         <View
           style={{

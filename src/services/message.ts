@@ -25,13 +25,18 @@ const findExistingConversation = async (userA, userB) => {
   return null
 }
 
-const createConversation = async (userA, userB) => {
+const createConversation = async (userA, userB, carId) => {
   const { data: conversation } = await supabase
     .from('conversations')
-    .insert({})
+    .insert({
+      car_id: carId 
+    })
     .select()
     .single()
+    console.log("conversation: ", conversation)
 
+    console.log("userA" , userA)
+    console.log("userB" , userB)
   await supabase.from('conversation_participants').insert([
     { conversation_id: conversation.id, user_id: userA },
     { conversation_id: conversation.id, user_id: userB },
@@ -40,14 +45,15 @@ const createConversation = async (userA, userB) => {
   return conversation.id
 }
 
-export async function startOrSendMessage(otherUserId, text){
+export async function startOrSendMessage(otherUserId, text, carId){
   const { data: user } = await supabase.auth.getUser()
   const myId = user.user.id
 
   let conversationId = await findExistingConversation(myId, otherUserId)
 
   if (!conversationId) {
-    conversationId = await createConversation(myId, otherUserId)
+    conversationId = await createConversation(myId, otherUserId, carId)
+    console.log("id ", conversationId)
   }
 
   // only send a message if text is provided and non-empty
@@ -59,6 +65,7 @@ export async function startOrSendMessage(otherUserId, text){
     })
   }
 
+  console.log(conversationId)
   return conversationId
 }
 
@@ -76,15 +83,12 @@ export async function fetchConversations() {
     .from('conversation_participants')
     .select('conversation_id')
     .eq('user_id', user.id)
-
-    console.log("conversation p: ", rows)
   if (error) {
     console.log('fetchConversations error', error)
     throw error
   }
 
   const ids = rows.map((r) => r.conversation_id)
-  console.log(ids)
   if (ids.length === 0) return []
 
   // for each conversation, load the other participant and last message
@@ -93,14 +97,26 @@ export async function fetchConversations() {
       // load the other user in this conversation
       const { data: participants } = await supabase
       .from('conversation_participants')
-  .select('user_id, users(id, name, profile_image)')
+  .select()
   .eq('conversation_id', conversationId)
   .neq('user_id', user.id) // exclude yourself
-  .limit(1) 
+  .single() 
 
-        console.log("participants: ", participants)
+  //User info of the other participant
+      const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', participants.user_id)
+      .single()
 
-      const otherUser = participants?.[0]?.users || null
+      const otherUser = data || null
+
+      // load th car id in conversation
+       const { data: car } = await supabase
+            .from('conversations')
+            .select('car_id')
+            .eq('id', conversationId)
+            .single()
 
       // load the last message (most recent)
       const { data: msgs } = await supabase
@@ -116,11 +132,12 @@ export async function fetchConversations() {
         id: conversationId,
         otherUser,
         lastMessage,
+        fromOtherUser: lastMessage?.sender_id != user.id,
+        car
       }
     }),
   )
 
-  console.log(conversations)
   return conversations
 }
 

@@ -516,3 +516,32 @@ export async function addCarPricing(car_price:{
     console.log('Failed to add car pricing : ', error)
   }
 }
+export async function checkIfCarOwned(carId){
+  try{
+       const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
+
+    if (authError || !user) {
+      console.error('No authenticated user')
+      return
+    }
+
+    const { data, error} = await supabase.from('cars').select('owner_id').eq('id', carId).single()
+
+    if (data?.owner_id === user.id){
+      return true
+    }
+
+    if (error){
+      console.log("error checking car if owned")
+      return false
+    }
+
+    return false
+
+  }catch (error){
+    console.log('failed to check car: ', error)
+  }
+}

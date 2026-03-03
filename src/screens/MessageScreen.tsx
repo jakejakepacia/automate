@@ -39,12 +39,14 @@ export default function MessageScreen({ navigation }) {
 
   const renderItem = ({ item }: any) => {
     const other = item.otherUser
+    const car = item.car
     return (
       <TouchableOpacity
         onPress={() =>
           navigation.navigate('Conversation', {
             conversationId: item.id,
             otherUser: other,
+            car: car,
           })
         }
         style={{
@@ -59,7 +61,7 @@ export default function MessageScreen({ navigation }) {
         </Text>
         {item.lastMessage && (
           <Text numberOfLines={1} style={{ color: '#555', marginTop: 4 }}>
-            {item.lastMessage.content}
+            {item.fromOtherUser ? '' : 'You:'} {item.lastMessage.content}
           </Text>
         )}
       </TouchableOpacity>
