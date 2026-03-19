@@ -1,7 +1,15 @@
 import React, { useState } from 'react'
-import { View, Text, TextInput, Button, StyleSheet, ActivityIndicator } from 'react-native'
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  ActivityIndicator,
+} from 'react-native'
 import { supabase } from '../../lib/supabase'
 import RegisterScreen from './RegisterScreen'
+import { resetPassword } from '../services/api'
 
 type Props = {
   onLogin: (user: any) => void
@@ -69,6 +77,9 @@ export default function LoginScreen({ onLogin }: Props) {
       )}
       <View style={{ marginTop: 12 }}>
         <Button title="Create account" onPress={() => setShowRegister(true)} />
+      </View>
+      <View style={{ marginTop: 12 }}>
+        <Button title="Forgot Password" onPress={() => resetPassword(email)} />
       </View>
     </View>
   )

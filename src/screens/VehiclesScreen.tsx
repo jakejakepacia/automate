@@ -12,18 +12,20 @@ import {
 import { supabase } from '../../lib/supabase'
 import { useRoute } from '@react-navigation/native'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
-import { fetchBookings, fetchOwnedCars } from '../services/api'
+import { fetchOwnedCars } from '../services/carService'
 import CarCard from '../components/carCard'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { Colors } from '../constants/colors'
+import { Car } from '../types/car'
 export default function VehiclesScreen({ navigation }) {
-  const [tab, setTab] = useState<'active' | 'owned' | 'pending' | 'rented'>(
-    'active',
+  const [tab, setTab] = useState<'active' | 'all vehicles' | 'pending'>(
+    'All Vehicles',
   )
   const [bookings, setBookings] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [cars, setCars] = useState([])
+  const [filteredCars, setFilteredCars] = useState<Car[]>([])
+  const [allCars, setAllCars] = useState<Car[]>([])
   const insents = useSafeAreaInsets()
 
   const route = useRoute()
@@ -32,35 +34,36 @@ export default function VehiclesScreen({ navigation }) {
   const fromAddCarPage = route.params?.fromAddCarPage
 
   useEffect(() => {
-    if (tab === 'active') loadRenting()
+    if (tab === 'all vehicles') loadOwnedCars()
   }, [tab])
 
   useEffect(() => {
     if (fromAddCarPage) {
-      setTab('owned')
+      setTab('all vehicles')
       loadOwnedCars()
     }
   }, [fromAddCarPage])
 
-  async function loadRenting() {
-    try {
-      setLoading(true)
-      setError(null)
-      const result = await fetchBookings()
-      setBookings(result)
-    } catch (error) {
-      console.error('Error fetching cars:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  // async function loadRenting() {
+  //   try {
+  //     setLoading(true)
+  //     setError(null)
+  //     const result = await fetchBookings()
+  //     setBookings(result)
+  //   } catch (error) {
+  //     console.error('Error fetching cars:', error)
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
 
   async function loadOwnedCars() {
     try {
       setLoading(true)
       setError(null)
       const result = await fetchOwnedCars()
-      setCars(result)
+      setAllCars(result)
+      setFilteredCars(result)
       setLoading(false)
     } catch (error) {
       console.error('error fetching owned cars: ', error)
@@ -69,7 +72,19 @@ export default function VehiclesScreen({ navigation }) {
 
   const handleOwnedCarPress = () => {
     loadOwnedCars()
-    setTab('owned')
+    setTab('all vehicles')
+  }
+
+  const handleActiveCarPress = () => {
+    const activeCars = allCars.filter((car) => car.isApprovedByAdmin === true)
+    setFilteredCars(activeCars) // assuming you store filtered list in state
+    setTab('active')
+  }
+
+  const handlePendingCarPress = () => {
+    const activeCars = allCars.filter((car) => car.isApprovedByAdmin === false)
+    setFilteredCars(activeCars) // assuming you store filtered list in state
+    setTab('pending')
   }
 
   function renderOwneCars({ item }: { item: any }) {
@@ -91,16 +106,20 @@ export default function VehiclesScreen({ navigation }) {
     <View style={[styles.container, { marginTop: insents.top }]}>
       <View style={styles.tabRow}>
         <TouchableOpacity
-          style={[styles.tab, tab === 'owned' ? styles.tabActive : null]}
+          style={[styles.tab, tab === 'all vehicles' ? styles.tabActive : null]}
           onPress={handleOwnedCarPress}
         >
-          <Text style={tab === 'owned' ? styles.tabTextActive : styles.tabText}>
-            Owned
+          <Text
+            style={
+              tab === 'all vehicles' ? styles.tabTextActive : styles.tabText
+            }
+          >
+            All Vehicles
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.tab, tab === 'active' ? styles.tabActive : null]}
-          onPress={() => setTab('active')}
+          onPress={handleActiveCarPress}
         >
           <Text
             style={tab === 'active' ? styles.tabTextActive : styles.tabText}
@@ -110,22 +129,12 @@ export default function VehiclesScreen({ navigation }) {
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.tab, tab === 'pending' ? styles.tabActive : null]}
-          onPress={() => setTab('pending')}
+          onPress={handlePendingCarPress}
         >
           <Text
             style={tab === 'pending' ? styles.tabTextActive : styles.tabText}
           >
             Pending
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tab, tab === 'rented' ? styles.tabActive : null]}
-          onPress={() => setTab('rented')}
-        >
-          <Text
-            style={tab === 'rented' ? styles.tabTextActive : styles.tabText}
-          >
-            Rented
           </Text>
         </TouchableOpacity>
       </View>
@@ -136,7 +145,7 @@ export default function VehiclesScreen({ navigation }) {
             <ActivityIndicator />
           ) : (
             <FlatList
-              data={cars}
+              data={filteredCars}
               keyExtractor={(i) => i.id}
               renderItem={renderOwneCars}
               showsVerticalScrollIndicator={false}

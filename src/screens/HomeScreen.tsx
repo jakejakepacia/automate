@@ -126,7 +126,10 @@ export default function HomeScreen({ navigation }) {
               Need car for today?
             </Text>
           </View>
-          <TouchableOpacity style={{ marginLeft: 'auto' }}>
+          <TouchableOpacity
+            style={{ marginLeft: 'auto' }}
+            onPress={() => navigation.navigate('Profile')}
+          >
             <Image
               source={{
                 uri: userInfo?.image ?? 'https://picsum.photos/200/120?random=',

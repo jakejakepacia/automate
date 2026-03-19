@@ -112,27 +112,6 @@ export default function App() {
           ),
         }}
       />
-      <Tab.Screen
-        name="Profile"
-        children={() => (
-          <ProfileScreen
-            user={user}
-            onSignOut={async () => {
-              await supabase.auth.signOut()
-              setUser(null)
-            }}
-          />
-        )}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons
-              name="account-circle-outline"
-              size={size}
-              color={color}
-            />
-          ),
-        }}
-      />
     </Tab.Navigator>
   )
 
@@ -141,6 +120,18 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Tabs" component={MyTabs} />
+          <Stack.Screen name="Profile" options={{ headerShown: false }}>
+            {({ navigation }) => (
+              <ProfileScreen
+                navigation={navigation}
+                user={user}
+                onSignOut={async () => {
+                  await supabase.auth.signOut()
+                  setUser(null)
+                }}
+              />
+            )}
+          </Stack.Screen>
           <Stack.Screen name="Details" component={DetailScreen} />
           <Stack.Screen name="VehicleForm" component={VehicleFormScreen} />
           <Stack.Screen

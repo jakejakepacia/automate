@@ -1,4 +1,35 @@
 import { supabase } from '../../lib/supabase'
+
+export async function resetPassword(email, password) {
+  const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: "automate://reset-password",
+  });
+
+  console.log("hey")
+  if (error) {
+    console.log("Error:", error.message);
+  } else {
+    console.log("Password reset email sent");
+    updatePassword(password)
+  }
+};
+
+const updatePassword = async (newPassword) => {
+  const { data, error } = await supabase.auth.updateUser({
+    password: newPassword,
+  });
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event === "PASSWORD_RECOVERY") {
+    console.log("User is recovering password");
+  }
+});
+  if (error) {
+    console.log(error.message);
+  } else {
+    console.log("Password updated");
+  }
+};
+
 export async function fetchUserInfo() {
   try {
     const {
@@ -298,6 +329,59 @@ export async function fetchOwnedCars() {
     console.log('fetch owned car error')
   }
 }
+
+export async function fetchActiveCars() {
+  try {
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
+
+    if (authError || !user) {
+      console.error('No authenticated user')
+      return
+    }
+
+    const { data, error } = await supabase
+      .from('cars')
+      .select(
+        `
+      id,
+      make,
+      model,
+      year,
+      color,
+      fuel_type,
+      transmission,
+      seats,
+      city,
+      province,
+      isApprovedByAdmin,
+      car_pricing (
+        price_per_day,
+        price_per_week,
+        price_per_month
+      ),
+      car_images (
+        image_url,
+        is_thumbnail
+      ),
+      users!owner_id(
+        name,
+        id
+      )
+    `,
+      )
+      .eq('owner_id', user.id)
+      .eq('isApprovedByAdmin', true)
+
+    if (error) throw error
+    return data
+  } catch (error) {
+    console.log('fetch owned car error')
+  }
+}
+
 export async function addCar(newCar: {
   make: string
   model: string
