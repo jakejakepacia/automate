@@ -1,4 +1,4 @@
-import { ScrollView, Text, View } from 'react-native'
+import { ScrollView, Text, TouchableOpacity, View, Image } from 'react-native'
 import { TextInput } from 'react-native-paper'
 import { Colors } from '../../constants/colors'
 export default function BasicCarInfoScreen({ formData, setFormData }) {
@@ -16,6 +16,7 @@ export default function BasicCarInfoScreen({ formData, setFormData }) {
       </View>
 
       <View style={{ gap: 20, marginTop: 20 }}>
+     
         <TextInput
           label="Make"
           mode="outlined"
@@ -34,7 +35,8 @@ export default function BasicCarInfoScreen({ formData, setFormData }) {
           onChangeText={(text) => setFormData({ ...formData, model: text })}
         />
 
-        <TextInput
+<View style={{gap: 10, flexDirection: "row", }}> 
+ <TextInput style={{flex: 1}}
           label="Year"
           mode="outlined"
           keyboardType="numeric"
@@ -42,8 +44,10 @@ export default function BasicCarInfoScreen({ formData, setFormData }) {
           activeOutlineColor={Colors.primary}
           value={formData.year}
           onChangeText={(text) => setFormData({ ...formData, year: text })}
+
         />
         <TextInput
+        style={{flex: 1}}
           label="Color"
           mode="outlined"
           outlineColor={Colors.primary}
@@ -51,6 +55,8 @@ export default function BasicCarInfoScreen({ formData, setFormData }) {
           value={formData.color}
           onChangeText={(text) => setFormData({ ...formData, color: text })}
         />
+</View>
+       
 
         <TextInput
           label="Plate number"

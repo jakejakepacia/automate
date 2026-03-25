@@ -185,11 +185,8 @@ export default function VehicleFormScreen({ navigation }) {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0} // adjust if you have header
-    >
+    <View
+      style={styles.container} >
       <View style={{ marginTop: insents.top }}>
         <NavigationBar title={'Add New Car'} navigation={navigation} />
       </View>
@@ -269,7 +266,7 @@ export default function VehicleFormScreen({ navigation }) {
           </TouchableOpacity>
         </View>
       </View>
-    </KeyboardAvoidingView>
+    </View>
   )
 }
 

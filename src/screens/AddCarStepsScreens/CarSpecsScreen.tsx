@@ -1,7 +1,11 @@
-import { Text, View, ScrollView } from 'react-native'
-import { TextInput } from 'react-native-paper'
+import { Text, View, ScrollView, TouchableOpacity, Image } from 'react-native'
+import { Divider, TextInput } from 'react-native-paper'
 import { Colors } from '../../constants/colors'
+import CarCategoriesCard from '../../components/CarCategoriesCard'
+import { useState } from 'react'
 export default function CarSpecsScreen({ formData, setFormData }) {
+
+  const [selected, setSelected] = useState<string | null>(null);
   return (
     <ScrollView style={{ gap: 10 }} showsVerticalScrollIndicator={false}>
       <View>
@@ -15,6 +19,46 @@ export default function CarSpecsScreen({ formData, setFormData }) {
       </View>
 
       <View style={{ gap: 20, marginTop: 20 }}>
+           
+           <View style={{ flexDirection: "row" }}>
+      <CarCategoriesCard
+        image={require("../../../assets/carCategoriesIcons/sedan.png")}
+        title="Sedan"
+        subtitle="5 seaters (Vios, Mirage, Honda City)"
+        selected={selected == "sedan"}
+        onPress={() => setSelected("sedan")}
+      />
+
+      <CarCategoriesCard
+        image={require("../../../assets/carCategoriesIcons/car.png")}
+        title="MPV"
+        subtitle="7 seaters (Innova, Xpander, Veloz)"
+        selected={selected == "mpv"}
+        onPress={() => setSelected("mpv")}
+      />
+    </View>
+
+
+
+           <View style={{backgroundColor: "white"}}>
+            <View style={{ flexDirection: "row"}}>
+  <TouchableOpacity style={{flex: 1}}>
+        <Text>Automatic</Text>
+      </TouchableOpacity>
+       <TouchableOpacity style={{flex: 1}}>
+        <Text>Manual</Text>
+      </TouchableOpacity>
+            </View>
+    <Divider />
+           <View style={{ flexDirection: "row"}}>
+  <TouchableOpacity style={{flex: 1}}>
+        <Text>Automatic</Text>
+      </TouchableOpacity>
+       <TouchableOpacity style={{flex: 1}}>
+        <Text>Manual</Text>
+      </TouchableOpacity>
+            </View>
+    </View>
         <TextInput
           label="Category"
           mode="outlined"

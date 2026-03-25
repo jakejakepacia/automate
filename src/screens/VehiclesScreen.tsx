@@ -17,9 +17,10 @@ import CarCard from '../components/carCard'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { Colors } from '../constants/colors'
 import { Car } from '../types/car'
+import { getPublicUrl } from '../services/api'
 export default function VehiclesScreen({ navigation }) {
   const [tab, setTab] = useState<'active' | 'all vehicles' | 'pending'>(
-    'All Vehicles',
+    'all vehicles',
   )
   const [bookings, setBookings] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
@@ -87,17 +88,32 @@ export default function VehiclesScreen({ navigation }) {
     setTab('pending')
   }
 
-  function renderOwneCars({ item }: { item: any }) {
+  function renderOwneCars({ item }: { item: Car }) {
+    const thumbnail =
+      item.car_images?.find((img) => img.is_thumbnail)?.image_url ||
+      item.car_images?.[0]?.image_url
+
+    const imageUrl = getPublicUrl(thumbnail)
+
     return (
       <TouchableOpacity
         key={item.id}
         onPress={() =>
           navigation.navigate('Details', { car: item, fromOwnedCars: true })
-        }
+        }        
       >
-        <Suspense fallback={<ActivityIndicator />}>
-          <CarCard car={item} />
-        </Suspense>
+        <View style={styles.card}>
+          {thumbnail ? (
+            <Image source={{ uri: imageUrl }} style={styles.thumb} />
+          ) : (
+            <View style={styles.thumbPlaceholder} />
+          )}
+          <View style={styles.info}>
+            <Text style={styles.title} numberOfLines={1}>
+              {`${item.make} ${item.model} ${item.year || ''}`}
+            </Text>
+          </View>
+        </View>
       </TouchableOpacity>
     )
   }
