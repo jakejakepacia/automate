@@ -23,6 +23,7 @@ import RentalListingSuccessScreen from './src/screens/CreateRentalListingScreens
 import RentingScreen from './src/screens/RentingScreen'
 import MessageScreen from './src/screens/MessageScreen'
 import ConversationScreen from './src/screens/ConversationScreen'
+import OwnerBookingsScreen from './src/screens/OwnerBookingsScreen'
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
 
@@ -152,6 +153,7 @@ export default function App() {
               gestureEnabled: false,
             }}
           />
+          <Stack.Screen name="OwnerBookings" component={OwnerBookingsScreen} />
           <Stack.Screen name="Conversation" component={ConversationScreen} />
         </Stack.Navigator>
       </NavigationContainer>

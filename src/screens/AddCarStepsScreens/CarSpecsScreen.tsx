@@ -94,8 +94,6 @@ export default function CarSpecsScreen({ formData, setFormData }) {
       ...prev,
       fuel_type,
     }))
-
-    console.log(formData)
   }
   return (
     <ScrollView style={{ gap: 10 }} showsVerticalScrollIndicator={false}>

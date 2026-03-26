@@ -25,6 +25,7 @@ export default function DetailScreen({ route, navigation }) {
   const { car, fromOwnedCars } = route.params
   const [favorite, setFavorite] = useState(false)
   const [isModalVisible, setModalVisible] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [selectedCar, setSelectedCar] = useState(car)
   const toggleModal = () => setModalVisible((prev) => !prev)
   const [requestedBooking, setRequestedBooking] = useState(false)
@@ -36,18 +37,25 @@ export default function DetailScreen({ route, navigation }) {
     car.car_images?.[0]?.image_url
   const [isCarOwned, setIsCarOwned] = useState(false)
   const imageUrl = getPublicUrl(thumbnail)
+  const hasRentalListing =
+    Array.isArray(car.car_pricing) &&
+    car.car_pricing.length > 0 &&
+    car.car_pricing.some(
+      (pricing) =>
+        pricing?.price_per_day != null ||
+        pricing?.price_per_week != null ||
+        pricing?.price_per_month != null,
+    )
 
   const price = car.car_pricing?.[0]?.price_per_day
 
   useEffect(() => {
     loadBookings()
-    console.log('car detttails, ', car)
   }, [])
 
   useEffect(() => {
     const checkCar = async () => {
       const result = await checkIfCarOwned(car.id)
-      console.log('ngek, ', result)
       setIsCarOwned(result)
     }
 
@@ -71,10 +79,9 @@ export default function DetailScreen({ route, navigation }) {
       if (booking != null) {
         setRequestedBooking(true)
         setBookingDetails(booking)
-        console.log('booking details, ', bookingDetails)
       }
     } catch (error) {
-      console.log(error)
+      return
     } finally {
       setIsLoading(false)
     }
@@ -107,7 +114,6 @@ export default function DetailScreen({ route, navigation }) {
     // owner id comes from the joined user record on the car
     const ownerId = car.users?.id
     const carId = car.id
-    console.log('Car: ', car)
     if (!ownerId) return
 
     // start conversation or reuse existing
@@ -123,6 +129,25 @@ export default function DetailScreen({ route, navigation }) {
       car,
     })
   }
+
+  const handleCreateRentalListing = () => {
+    setIsMenuOpen(false)
+    navigation.navigate('CreateRentalListing', {
+      car_id: selectedCar.id,
+    })
+  }
+
+  const handleEditCarDetails = () => {
+    setIsMenuOpen(false)
+  }
+
+  const handleViewBookings = () => {
+    navigation.navigate('OwnerBookings', {
+      car: selectedCar,
+      initialStatus: 'pending',
+    })
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -134,16 +159,49 @@ export default function DetailScreen({ route, navigation }) {
           {car.make} {car.model}
         </Text>
 
-        <TouchableOpacity
-          onPress={() => setFavorite(!favorite)}
-          style={styles.iconBtn}
-        >
-          <MaterialIcons
-            name={favorite ? 'favorite' : 'favorite-border'}
-            size={22}
-            color={favorite ? '#e0245e' : Colors.black}
-          />
-        </TouchableOpacity>
+        {fromOwnedCars ? (
+          <View style={styles.menuWrapper}>
+            <TouchableOpacity
+              onPress={() => setIsMenuOpen((prev) => !prev)}
+              style={styles.iconBtn}
+            >
+              <MaterialIcons name="more-vert" size={24} color={Colors.black} />
+            </TouchableOpacity>
+
+            {isMenuOpen && (
+              <View style={styles.dropdownMenu}>
+                {!hasRentalListing && (
+                  <TouchableOpacity
+                    style={styles.dropdownItem}
+                    onPress={handleCreateRentalListing}
+                  >
+                    <Text style={styles.dropdownItemText}>
+                      Create Rental Listing
+                    </Text>
+                  </TouchableOpacity>
+                )}
+
+                <TouchableOpacity
+                  style={styles.dropdownItem}
+                  onPress={handleEditCarDetails}
+                >
+                  <Text style={styles.dropdownItemText}>Edit Car Details</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        ) : (
+          <TouchableOpacity
+            onPress={() => setFavorite(!favorite)}
+            style={styles.iconBtn}
+          >
+            <MaterialIcons
+              name={favorite ? 'favorite' : 'favorite-border'}
+              size={22}
+              color={favorite ? '#e0245e' : Colors.black}
+            />
+          </TouchableOpacity>
+        )}
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -185,6 +243,15 @@ export default function DetailScreen({ route, navigation }) {
             <Text style={styles.specValue}>{car.fuel_type ?? 'N/A'}</Text>
           </View>
         </View>
+
+        {fromOwnedCars && (
+          <TouchableOpacity
+            style={[styles.button, styles.bookingsButton]}
+            onPress={handleViewBookings}
+          >
+            <Text style={styles.bookingsButtonText}>View Bookings</Text>
+          </TouchableOpacity>
+        )}
 
         {!fromOwnedCars && (
           <View style={styles.section}>
@@ -279,27 +346,6 @@ export default function DetailScreen({ route, navigation }) {
             </Modal>
           </View>
         )}
-
-        {fromOwnedCars && (
-          <View style={{ gap: 10, marginTop: 20 }}>
-            <TouchableOpacity
-              style={styles.forRentButton}
-              onPress={() =>
-                navigation.navigate('CreateRentalListing', {
-                  car_id: selectedCar.id,
-                })
-              }
-            >
-              <Text style={styles.step}>Create Rental Listing</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.goHomeBtn}>
-              <Text style={[styles.step, { color: Colors.primary }]}>
-                Edit Car Details
-              </Text>
-            </TouchableOpacity>
-          </View>
-        )}
       </ScrollView>
     </SafeAreaView>
   )
@@ -314,7 +360,34 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
+  menuWrapper: {
+    position: 'relative',
+  },
   iconBtn: { padding: 6 },
+  dropdownMenu: {
+    position: 'absolute',
+    top: 42,
+    right: 0,
+    backgroundColor: Colors.white,
+    borderRadius: 12,
+    minWidth: 190,
+    paddingVertical: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 6,
+    zIndex: 20,
+  },
+  dropdownItem: {
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  dropdownItemText: {
+    fontSize: 14,
+    color: '#0f172a',
+    fontFamily: 'MyRegularFont',
+  },
   title: {
     fontFamily: 'MySubHeaderFontSemiBold',
     fontSize: 16,
@@ -368,34 +441,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: Colors.primary,
   },
+  bookingsButton: {
+    marginTop: 8,
+  },
+  bookingsButtonText: {
+    color: Colors.white,
+    fontFamily: 'MyRegularFont',
+    fontSize: 14,
+  },
 
   modalContainer: {
     height: '90%',
     backgroundColor: 'white',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-  },
-  forRentButton: {
-    backgroundColor: Colors.primary,
-    borderRadius: 10,
-    alignContent: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 50,
-  },
-  goHomeBtn: {
-    borderColor: Colors.primary,
-    borderWidth: 1,
-    borderRadius: 10,
-    alignContent: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 50,
-  },
-  step: {
-    fontSize: 14,
-    lineHeight: 22,
-    color: 'white',
-    fontFamily: 'MyRegularFont',
   },
 })

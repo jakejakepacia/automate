@@ -66,7 +66,6 @@ export default function ConversationScreen({ route, navigation }) {
   const loadCar = async () => {
     const result = await fetchCarDetailsById(car.car_id)
     setCarDetails(result)
-    console.log('car details: ', carDetails)
   }
 
   const handleSend = async () => {

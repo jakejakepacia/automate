@@ -90,9 +90,7 @@ export default function CreateRentalListingScreen({ navigation }) {
         with_driver_price_per_day: formData.driver_price_per_day,
         car_id: car_id,
       }
-      const updatedCar = await addCarPricing(car_price)
-
-      console.log('Updated:', updatedCar)
+      await addCarPricing(car_price)
       Alert.alert('Success', 'Car updated successfully')
     } catch (error: any) {
       Alert.alert('Error', error.message)
@@ -106,7 +104,6 @@ export default function CreateRentalListingScreen({ navigation }) {
       setStep(step + 1)
     }
 
-    console.log(step)
     if (step === totalSteps) {
       try {
         setIsLoading(true)
@@ -115,7 +112,7 @@ export default function CreateRentalListingScreen({ navigation }) {
 
         navigation.navigate('RentalListingSuccessScreen')
       } catch (error) {
-        console.log('Error submitting:', error)
+        return
       } finally {
         setIsLoading(false)
       }

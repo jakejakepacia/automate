@@ -6,7 +6,6 @@ import { useRoute } from '@react-navigation/native'
 export default function AddCarSuccessScreen({ navigation }) {
   const route = useRoute()
   const car_id = route.params?.car_id
-  console.log('new car id: ,', car_id)
   const navigateToVehicleListPage = () => {
     navigation.navigate('Tabs', {
       screen: 'Vehicles',

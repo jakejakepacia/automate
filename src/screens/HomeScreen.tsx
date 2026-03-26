@@ -59,8 +59,6 @@ export default function HomeScreen({ navigation }) {
 
   useEffect(() => {
     // Wrap async function inside useEffect
-
-    console.log('here')
     loadCars()
   }, [])
 
@@ -81,7 +79,6 @@ export default function HomeScreen({ navigation }) {
       setRefreshing(true)
       const data = await fetchCars()
       setCars(data)
-      console.log(cars)
     } catch (error) {
       console.error('Error fetching cars:', error)
     } finally {

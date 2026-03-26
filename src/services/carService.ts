@@ -47,6 +47,6 @@ export async function fetchOwnedCars(): Promise<Car[] | undefined> {
 
     return data as Car[];
   } catch (error) {
-    console.log('fetch owned car error');
+    return;
   }
 }

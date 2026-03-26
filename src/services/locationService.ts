@@ -13,7 +13,7 @@ export async function getCityProvince(latitude: number, longitude: number) {
       return { city, province }
     }
   } catch (error) {
-    console.log('Reverse geocode error', error)
+    return { city: '', province: '' }
   }
 
   return { city: '', province: '' }

@@ -29,7 +29,6 @@ export default function UploadCarImages({ images, setImages }) {
     const hasPermission = await requestPermissions()
     if (!hasPermission) return
 
-    console.log('images ', images.length)
     if (images.length === 6) {
       alert('Only upload maximum 6 images')
       return

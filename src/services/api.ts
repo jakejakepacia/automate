@@ -5,11 +5,8 @@ export async function resetPassword(email, password) {
     redirectTo: "automate://reset-password",
   });
 
-  console.log("hey")
   if (error) {
-    console.log("Error:", error.message);
   } else {
-    console.log("Password reset email sent");
     updatePassword(password)
   }
 };
@@ -20,13 +17,9 @@ const updatePassword = async (newPassword) => {
   });
 supabase.auth.onAuthStateChange((event, session) => {
   if (event === "PASSWORD_RECOVERY") {
-    console.log("User is recovering password");
   }
 });
   if (error) {
-    console.log(error.message);
-  } else {
-    console.log("Password updated");
   }
 };
 
@@ -108,9 +101,6 @@ export async function addBooking(requestedBooking: {
     ...requestedBooking,
     status: requestedBooking.status || 'pending',
   }
-
-  console.log(bookingToInsert)
-  console.log('yting')
 
   const { data, error } = await supabase
     .from('bookings')
@@ -326,7 +316,7 @@ export async function fetchOwnedCars() {
     if (error) throw error
     return data
   } catch (error) {
-    console.log('fetch owned car error')
+    return
   }
 }
 
@@ -378,7 +368,7 @@ export async function fetchActiveCars() {
     if (error) throw error
     return data
   } catch (error) {
-    console.log('fetch owned car error')
+    return
   }
 }
 
@@ -447,8 +437,6 @@ export async function uploadCarImage(imageUri) {
     })
 
   if (error) {
-    console.log(error.message)
-    console.log(error)
     throw error
   }
 
@@ -478,7 +466,7 @@ export async function addCarImage(newImage: {
 
     return data
   } catch (error) {
-    console.log('Failed to add car image : ', error)
+    return
   }
 }
 
@@ -536,7 +524,7 @@ export async function fetchCarDetailsById(car_id) {
     if (error) throw error
     return data
   } catch (error) {
-    console.log('fetch car details error', error)
+    return
   }
 }
 export async function updateCarDetails(
@@ -563,7 +551,6 @@ export async function updateCarDetails(
     .single() // ensures one row
 
   if (error) {
-    console.log('Update error:', error.message)
     throw error
   }
 
@@ -597,7 +584,7 @@ export async function addCarPricing(car_price:{
 
     return data
   } catch (error) {
-    console.log('Failed to add car pricing : ', error)
+    return
   }
 }
 export async function checkIfCarOwned(carId){
@@ -619,13 +606,80 @@ export async function checkIfCarOwned(carId){
     }
 
     if (error){
-      console.log("error checking car if owned")
       return false
     }
 
     return false
 
   }catch (error){
-    console.log('failed to check car: ', error)
+    return
+  }
+}
+
+export async function fetchOwnerBookingsByCar(
+  carId: string,
+  status?: string,
+) {
+  try {
+    let query = supabase
+      .from('bookings')
+      .select(
+        `
+        id,
+        car_id,
+        renter_id,
+        start_date,
+        end_date,
+        total_price,
+        initial_price,
+        status,
+      users!renter_id (
+  id,
+  name,
+  city,
+  profile_image
+)
+      `,
+      )
+      .eq('car_id', carId)
+      .order('start_date', { ascending: true })
+
+    if (status) {
+      query = query.eq('status', status)
+    }
+
+    const { data, error } = await query
+
+    if (error) {
+      console.error('Error fetching owner bookings:', error.message)
+      return []
+    }
+
+    return data || []
+  } catch (error) {
+    return []
+  }
+}
+
+export async function updateBookingStatus(
+  bookingId: string,
+  status: string,
+) {
+  try {
+    const { data, error } = await supabase
+      .from('bookings')
+      .update({ status })
+      .eq('id', bookingId)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Error updating booking status:', error.message)
+      return null
+    }
+
+    return data
+  } catch (error) {
+    return null
   }
 }

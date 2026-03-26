@@ -96,8 +96,6 @@ export default function VehicleFormScreen({ navigation }) {
 
         break
       case 3:
-        console.log(carImages.length)
-        console.log('step', currentStep)
         if (carImages.length === 0) {
           alert('Please upload atleast 1 image')
 
@@ -107,7 +105,7 @@ export default function VehicleFormScreen({ navigation }) {
         break
 
       default:
-        console.log('try')
+        break
     }
 
     if (!fields) {

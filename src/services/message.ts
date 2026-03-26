@@ -7,7 +7,6 @@ const findExistingConversation = async (userA, userB) => {
     .in('user_id', [userA, userB])
 
   if (error) {
-    console.log(error)
     throw error
   }
 
@@ -33,10 +32,6 @@ const createConversation = async (userA, userB, carId) => {
     })
     .select()
     .single()
-    console.log("conversation: ", conversation)
-
-    console.log("userA" , userA)
-    console.log("userB" , userB)
   await supabase.from('conversation_participants').insert([
     { conversation_id: conversation.id, user_id: userA },
     { conversation_id: conversation.id, user_id: userB },
@@ -53,7 +48,6 @@ export async function startOrSendMessage(otherUserId, text, carId){
 
   if (!conversationId) {
     conversationId = await createConversation(myId, otherUserId, carId)
-    console.log("id ", conversationId)
   }
 
   // only send a message if text is provided and non-empty
@@ -65,7 +59,6 @@ export async function startOrSendMessage(otherUserId, text, carId){
     })
   }
 
-  console.log(conversationId)
   return conversationId
 }
 
@@ -84,7 +77,6 @@ export async function fetchConversations() {
     .select('conversation_id')
     .eq('user_id', user.id)
   if (error) {
-    console.log('fetchConversations error', error)
     throw error
   }
 
@@ -150,7 +142,6 @@ export async function fetchMessages(conversationId) {
     .order('created_at', { ascending: true })
 
   if (error) {
-    console.log('fetchMessages error', error)
     throw error
   }
 
@@ -168,9 +159,7 @@ export async function sendMessage(conversationId, text) {
   })
 
   if (error) {
-    console.log('sendMessage error', error)
     throw error
   }
 }
-
 

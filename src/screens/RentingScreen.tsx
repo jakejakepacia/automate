@@ -47,7 +47,6 @@ export default function RentingScreen({ navigation }) {
 
       if (tab === 'requested') {
         const result = await fetchPendingBookings()
-        console.log('pending bookings', result)
         setBookings(result)
       } else if (tab === 'upcoming') {
         const result = await fetchUpcomingBookings()

@@ -31,7 +31,6 @@ export default function PickupMap({ formData, setFormData }) {
   const handleMapPress = async (event: any) => {
     const { latitude, longitude } = event.nativeEvent.coordinate
     setPin({ latitude, longitude })
-    console.log('Selected location:', latitude, longitude)
 
     const { city, province } = await getCityProvince(latitude, longitude)
 
@@ -42,13 +41,6 @@ export default function PickupMap({ formData, setFormData }) {
       city,
       province,
     }))
-
-    console.log('Updated formData:', {
-      latitude,
-      longitude,
-      city,
-      province,
-    })
   }
 
   if (!location) {
