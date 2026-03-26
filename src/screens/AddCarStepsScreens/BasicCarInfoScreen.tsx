@@ -7,7 +7,7 @@ export default function BasicCarInfoScreen({ formData, setFormData }) {
       <View>
         <Text style={{ fontFamily: 'MyHeaderFontBold', fontSize: 20 }}>
           {' '}
-          Step 1: Basic Information{' '}
+          Step 2: Basic Information{' '}
         </Text>
         <Text style={{ fontFamily: 'MyHeaderFontRegular', fontSize: 16 }}>
           Enter the basic information exactly as it appears on the vehicle
@@ -16,7 +16,6 @@ export default function BasicCarInfoScreen({ formData, setFormData }) {
       </View>
 
       <View style={{ gap: 20, marginTop: 20 }}>
-     
         <TextInput
           label="Make"
           mode="outlined"
@@ -35,28 +34,27 @@ export default function BasicCarInfoScreen({ formData, setFormData }) {
           onChangeText={(text) => setFormData({ ...formData, model: text })}
         />
 
-<View style={{gap: 10, flexDirection: "row", }}> 
- <TextInput style={{flex: 1}}
-          label="Year"
-          mode="outlined"
-          keyboardType="numeric"
-          outlineColor={Colors.primary}
-          activeOutlineColor={Colors.primary}
-          value={formData.year}
-          onChangeText={(text) => setFormData({ ...formData, year: text })}
-
-        />
-        <TextInput
-        style={{flex: 1}}
-          label="Color"
-          mode="outlined"
-          outlineColor={Colors.primary}
-          activeOutlineColor={Colors.primary}
-          value={formData.color}
-          onChangeText={(text) => setFormData({ ...formData, color: text })}
-        />
-</View>
-       
+        <View style={{ gap: 10, flexDirection: 'row' }}>
+          <TextInput
+            style={{ flex: 1 }}
+            label="Year"
+            mode="outlined"
+            keyboardType="numeric"
+            outlineColor={Colors.primary}
+            activeOutlineColor={Colors.primary}
+            value={formData.year}
+            onChangeText={(text) => setFormData({ ...formData, year: text })}
+          />
+          <TextInput
+            style={{ flex: 1 }}
+            label="Color"
+            mode="outlined"
+            outlineColor={Colors.primary}
+            activeOutlineColor={Colors.primary}
+            value={formData.color}
+            onChangeText={(text) => setFormData({ ...formData, color: text })}
+          />
+        </View>
 
         <TextInput
           label="Plate number"

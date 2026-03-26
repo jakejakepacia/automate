@@ -14,6 +14,15 @@ export type CarOwner = {
   name: string;
 };
 
+export type CarSpecs = {
+  id: number;
+  category: string;
+  seats: number;
+  title: string;
+  subtitle: string;
+  image: any;
+}
+
 export type Car = {
   id: string;
   make: string;

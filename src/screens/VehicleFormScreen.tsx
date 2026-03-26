@@ -60,8 +60,8 @@ export default function VehicleFormScreen({ navigation }) {
   })
 
   const stepFields = {
-    1: ['make', 'model', 'year', 'color', 'plate_number'],
-    2: ['category', 'transmission', 'fuel_type', 'seats'],
+    2: ['make', 'model', 'year', 'color', 'plate_number'],
+    1: ['category', 'transmission', 'fuel_type', 'seats'],
     4: ['city', 'province', 'pickup_location'],
   }
 
@@ -87,7 +87,7 @@ export default function VehicleFormScreen({ navigation }) {
     const fields = stepFields[currentStep]
 
     switch (currentStep) {
-      case 1:
+      case 2:
         if (!isValidYear(formData.year)) {
           alert('Please enter valid year')
 
@@ -185,17 +185,16 @@ export default function VehicleFormScreen({ navigation }) {
   }
 
   return (
-    <View
-      style={styles.container} >
+    <View style={styles.container}>
       <View style={{ marginTop: insents.top }}>
         <NavigationBar title={'Add New Car'} navigation={navigation} />
       </View>
 
       <View style={{ padding: 16, flex: 1 }}>
-        {step === 1 && (
+        {step === 2 && (
           <BasicCarInfoScreen formData={formData} setFormData={setFormData} />
         )}
-        {step === 2 && (
+        {step === 1 && (
           <CarSpecsScreen formData={formData} setFormData={setFormData} />
         )}
         {step === 3 && (
